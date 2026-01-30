@@ -1,3 +1,5 @@
+import { authClient } from "./auth-client";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function login(data: { email: string; password: string }) {
@@ -38,6 +40,14 @@ export async function register(data: {
 
   return res.json();
 }
+
+export async function loginWithGoogle() {
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "http://localhost:3000/", 
+  });
+}
+
 
 export async function logout() {
   await fetch(`${API_URL}/api/auth/sign-out`, {
