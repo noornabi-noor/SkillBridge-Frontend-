@@ -25,6 +25,8 @@ export async function register(data: {
   email: string;
   password: string;
   phone?: string; 
+  role: string;
+  image?: string;
 }) {
   const res = await fetch(`${API_URL}/api/auth/sign-up/email`, {
     method: "POST",
@@ -47,7 +49,6 @@ export async function loginWithGoogle() {
     callbackURL: "http://localhost:3000/", 
   });
 }
-
 
 export async function logout() {
   await fetch(`${API_URL}/api/auth/sign-out`, {
