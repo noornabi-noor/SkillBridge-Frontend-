@@ -1,15 +1,22 @@
 export default function Reviews({ stats }: { stats: any }) {
   return (
-    <div className="bg-white p-4 rounded shadow mb-6">
-      <h2 className="text-lg font-semibold mb-2">Reviews</h2>
-      {stats.reviews.length === 0 && <p>No reviews yet.</p>}
-      <ul>
-        {stats.reviews.map((r: any) => (
-          <li key={r.id}>
-            {r.student?.name} - Rating: {r.rating} - {r.comment}
-          </li>
-        ))}
-      </ul>
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6">
+      <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Reviews</h2>
+      {stats.reviews.length === 0 ? (
+        <p className="text-gray-600 dark:text-gray-400">No reviews yet.</p>
+      ) : (
+        <ul className="space-y-2">
+          {stats.reviews.map((r: any) => (
+            <li
+              key={r.id}
+              className="p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            >
+              <strong>{r.student?.name}</strong> - Rating: {r.rating} <br />
+              {r.comment}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

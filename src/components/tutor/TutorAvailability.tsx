@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   getTutorAvailability,
@@ -16,13 +17,8 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
     endTime: "",
   });
 
-  // For editing slots dynamically
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editSlot, setEditSlot] = useState({
-    dayOfWeek: 0,
-    startTime: "",
-    endTime: "",
-  });
+  const [editSlot, setEditSlot] = useState({ dayOfWeek: 0, startTime: "", endTime: "" });
 
   useEffect(() => {
     fetchSlots();
@@ -30,9 +26,15 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
 
   const fetchSlots = async () => {
     setLoading(true);
-    const data = await getTutorAvailability(tutorId);
-    setSlots(data);
-    setLoading(false);
+    try {
+      const data = await getTutorAvailability(tutorId);
+      setSlots(data);
+    } catch (err) {
+      console.error("Fetch slots error:", err);
+      alert("Failed to fetch availability");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreate = async () => {
@@ -45,9 +47,10 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
       await createAvailability(tutorId, slot);
       setNewSlot({ dayOfWeek: "", startTime: "", endTime: "" });
       fetchSlots();
+      alert("Slot added ✅");
     } catch (err) {
       console.error("Create slot error:", err);
-      alert("Failed to create availability");
+      alert("Failed to create slot ❌");
     }
   };
 
@@ -60,10 +63,10 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
       });
       setEditingId(null);
       fetchSlots();
-      alert("Availability updated ✅");
+      alert("Slot updated ✅");
     } catch (err) {
       console.error("Update error:", err);
-      alert("Update failed ❌");
+      alert("Failed to update slot ❌");
     }
   };
 
@@ -71,41 +74,45 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
     try {
       await deleteAvailability(id);
       fetchSlots();
+      alert("Slot deleted ✅");
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Delete failed ❌");
+      alert("Failed to delete slot ❌");
     }
   };
 
   if (loading) return <p>Loading availability...</p>;
 
   return (
-    <div className="bg-white p-4 rounded shadow">
-      <h2 className="text-lg font-semibold mb-4">Availability Slots</h2>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
+        Availability Slots
+      </h2>
 
       {/* Add new slot */}
       <div className="mb-4 flex gap-2">
         <input
-          placeholder="Day of Week"
+          type="number"
+          placeholder="Day"
           value={newSlot.dayOfWeek}
           onChange={(e) => setNewSlot({ ...newSlot, dayOfWeek: e.target.value })}
-          className="border px-2 rounded w-20"
+          className="border dark:border-gray-600 px-2 py-1 rounded w-20 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <input
           type="time"
           value={newSlot.startTime}
           onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-          className="border px-2 rounded"
+          className="border dark:border-gray-600 px-2 py-1 rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <input
           type="time"
           value={newSlot.endTime}
           onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-          className="border px-2 rounded"
+          className="border dark:border-gray-600 px-2 py-1 rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <button
           onClick={handleCreate}
-          className="bg-blue-500 text-white px-3 py-1 rounded"
+          className="bg-blue-500 dark:bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-600 dark:hover:bg-blue-700"
         >
           Add
         </button>
@@ -114,50 +121,49 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
       {/* Existing slots */}
       <ul>
         {slots.map((slot) => (
-          <li key={slot.id} className="flex justify-between items-center mb-2">
+          <li
+            key={slot.id}
+            className="flex justify-between items-center mb-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             {editingId === slot.id ? (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center flex-wrap">
                 <input
                   type="number"
                   value={editSlot.dayOfWeek}
                   onChange={(e) =>
                     setEditSlot({ ...editSlot, dayOfWeek: Number(e.target.value) })
                   }
-                  className="border px-1 w-16 rounded"
+                  className="border dark:border-gray-600 px-1 py-1 w-16 rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
                 <input
                   type="time"
                   value={editSlot.startTime}
-                  onChange={(e) =>
-                    setEditSlot({ ...editSlot, startTime: e.target.value })
-                  }
-                  className="border px-1 rounded"
+                  onChange={(e) => setEditSlot({ ...editSlot, startTime: e.target.value })}
+                  className="border dark:border-gray-600 px-1 py-1 rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
                 <input
                   type="time"
                   value={editSlot.endTime}
-                  onChange={(e) =>
-                    setEditSlot({ ...editSlot, endTime: e.target.value })
-                  }
-                  className="border px-1 rounded"
+                  onChange={(e) => setEditSlot({ ...editSlot, endTime: e.target.value })}
+                  className="border dark:border-gray-600 px-1 py-1 rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
                 <button
                   onClick={() => handleUpdate(slot.id)}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
+                  className="bg-green-500 dark:bg-green-600 text-white px-2 py-1 rounded hover:bg-green-600 dark:hover:bg-green-700"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="bg-gray-400 text-white px-2 py-1 rounded"
+                  className="bg-gray-400 dark:bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-500 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
               <>
-                <span>
-                  {slot.dayOfWeek}: {slot.startTime} - {slot.endTime}{" "}
+                <span className="text-gray-800 dark:text-gray-100">
+                  Day {slot.dayOfWeek}: {slot.startTime} - {slot.endTime}{" "}
                   {slot.isBooked ? "(Booked)" : ""}
                 </span>
                 <div className="flex gap-1">
@@ -170,13 +176,13 @@ export default function TutorAvailability({ tutorId }: { tutorId: string }) {
                         endTime: slot.endTime,
                       });
                     }}
-                    className="bg-yellow-400 text-white px-2 py-1 rounded"
+                    className="bg-yellow-400 dark:bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-500 dark:hover:bg-yellow-600"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(slot.id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-500 dark:bg-red-600 text-white px-2 py-1 rounded hover:bg-red-600 dark:hover:bg-red-700"
                   >
                     Delete
                   </button>
