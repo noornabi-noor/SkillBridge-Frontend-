@@ -17,7 +17,7 @@ export default function VerifyEmailPage() {
           setStatus("success");
           // Delay redirect so user sees the message first
           setTimeout(() => {
-            router.push("/");
+            router.push("/dashboard");
           }, 3000); // wait 3 seconds before redirect
         })
         .catch(() => {

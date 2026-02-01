@@ -14,26 +14,6 @@ export async function getAllTutors() {
   return json.data;
 }
 
-// export async function getSingleTutor(id: string) {
-//   const url = `${API_URL}/api/tutors/${id}`;
-//   console.log("Fetching tutor from:", url);
-
-//   const res = await fetch(url, { cache: "no-store" });
-
-//   console.log("Fetch status:", res.status);
-
-//   if (!res.ok) {
-//     const text = await res.text();
-//     console.error("Response text:", text);
-//     throw new Error("Failed to fetch tutor");
-//   }
-
-//   const json = await res.json();
-//   console.log("Tutor data:", json.data);
-
-//   return json.data;
-// }
-
 
 export async function getSingleTutor(id: string) {
   const res = await fetch(`${API_URL}/api/tutors/${id}`, { cache: "no-store" });
@@ -42,5 +22,20 @@ export async function getSingleTutor(id: string) {
     return null; // gracefully handle 404
   }
   const json = await res.json();
+  return json.data;
+}
+
+
+export async function getAllUsers() {
+  const res = await fetch(`${API_URL}/api/users`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch users");
+  }
+
+  const json = await res.json();
+
   return json.data;
 }

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { login, loginWithGoogle } from "@/services/auth/auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +20,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { login, loginWithGoogle } from "@/services/auth/authClient";
 
 export function LoginForm({
   className,
@@ -45,7 +45,7 @@ export function LoginForm({
       await login({ email, password });
 
       // redirect after login
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {

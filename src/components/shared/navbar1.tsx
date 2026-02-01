@@ -25,6 +25,7 @@ const menu = [
   { title: "Find Tutors", url: "/find-tutors" },
   { title: "Categories", url: "/categories" },
   { title: "Become a Tutor", url: "/become-tutor" },
+  { title: "AllUsers", url: "/allUsers" },
 ];
 
 function Navbar1() {

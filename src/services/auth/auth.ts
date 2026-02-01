@@ -1,58 +1,31 @@
-import { authClient } from "./auth-client";
+// services/auth/auth.ts
+
+"use server"; // MUST be first line
+import { cookies } from "next/headers";
+// import { authClient } from "./auth-client";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function login(data: { email: string; password: string }) {
-  const res = await fetch(`${API_URL}/api/auth/sign-in/email`, {
-    method: "POST",
-    credentials: "include", 
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+
+  const allCookies = cookieStore.getAll();
+
+  const cookieHeader = allCookies
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
+    method: "GET",
     headers: {
-      "Content-Type": "application/json",
+      Cookie: cookieHeader,
+      Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     },
-    body: JSON.stringify(data), 
+    cache: "no-store",
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Login failed");
-  }
-
-  return res.json();
-}
-
-export async function register(data: {
-  name: string;
-  email: string;
-  password: string;
-  phone?: string; 
-  role: string;
-  image?: string;
-}) {
-  const res = await fetch(`${API_URL}/api/auth/sign-up/email`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Registration failed");
-  }
-
-  return res.json();
-}
-
-export async function loginWithGoogle() {
-  await authClient.signIn.social({
-    provider: "google",
-    callbackURL: "http://localhost:3000/", 
-  });
-}
-
-export async function logout() {
-  await fetch(`${API_URL}/api/auth/sign-out`, {
-    method: "POST",
-    credentials: "include",
-  });
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json.data;
 }
