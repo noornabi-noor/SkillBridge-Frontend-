@@ -1,47 +1,106 @@
-// app/(DashboardLayouts)/dashboard/student/StudentDashboard.tsx
-// import { getCurrentUser } from "@/services/auth/auth";
-
-// export default async function StudentDashboard() {
-//   const user = await getCurrentUser();
-
-//   return (
-//     <div>
-//       <h1 className="text-3xl font-bold">Student Dashboard</h1>
-//       <p>{user?.name}</p>
-//       <p>{user?.email}</p>
-//     </div>
-//   );
-// }
-
-
 "use client";
 
-import { logout } from "@/services/auth/authClient";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getCurrentUser } from "@/services/auth/auth";
+import { logout } from "@/services/auth/authClient";
+import BrowseTutors from "@/components/studentDashboard/BrowseTutors";
+import StudentBookings from "@/components/studentDashboard/StudentBookings";
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Active tab for sidebar navigation
+  const [activeTab, setActiveTab] = useState<
+    "browseTutors" | "myBookings" | "profile"
+  >("browseTutors");
+
+  // Fetch current student user
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          router.push("/login");
+          return;
+        }
+        setUser(currentUser);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await logout();          // destroy session
-      router.push("/");        // go home
-      router.refresh();        // clear cached session
+      await logout();
+      router.push("/");
+      router.refresh();
     } catch (err) {
       console.error("Logout failed", err);
     }
   };
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold">Student Dashboard</h1>
+  if (loading) return <div>Loading...</div>;
 
-      <button
-        onClick={handleLogout}
-        className="mt-4 rounded bg-red-500 px-4 py-2 text-white"
-      >
-        Logout
-      </button>
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white shadow p-4">
+        <h2 className="text-xl font-bold mb-4">Student Dashboard</h2>
+        <ul className="space-y-2">
+          <li
+            className={`p-2 rounded cursor-pointer ${
+              activeTab === "browseTutors" ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab("browseTutors")}
+          >
+            Browse Tutors
+          </li>
+          <li
+            className={`p-2 rounded cursor-pointer ${
+              activeTab === "myBookings" ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab("myBookings")}
+          >
+            My Bookings
+          </li>
+          <li
+            className={`p-2 rounded cursor-pointer ${
+              activeTab === "profile" ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab("profile")}
+          >
+            My Profile
+          </li>
+        </ul>
+        <button
+          onClick={handleLogout}
+          className="mt-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 p-6 overflow-auto">
+        <h1 className="text-2xl font-bold mb-4">
+          Welcome, {user.name || "Student"}
+        </h1>
+
+        {activeTab === "browseTutors" && <BrowseTutors />}
+        {activeTab === "myBookings" && user && (<StudentBookings studentId={user.id} />)}
+        {activeTab === "profile" && (
+          <div>
+            <p>Student Profile page (coming soon)</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

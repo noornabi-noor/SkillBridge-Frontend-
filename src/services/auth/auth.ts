@@ -2,8 +2,6 @@
 
 "use server"; // MUST be first line
 import { cookies } from "next/headers";
-// import { authClient } from "./auth-client";
-
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

@@ -6,7 +6,7 @@ import { logout } from "@/services/auth/authClient";
 import { getTutorDashboardStats } from "@/services/dashboard/tutor";
 import { getCurrentUser } from "@/services/auth/auth";
 
-import TutorAvailability from "@/components/tutor/TutorAvailability";
+import TutorAvailability from "@/components/tutorDashboard/TutorAvailability";
 import Sidebar from "@/components/tutorDashboard/Sidebar";
 import Navbar from "@/components/tutorDashboard/Navbar";
 import OverviewCards from "@/components/tutorDashboard/OverviewCards";
