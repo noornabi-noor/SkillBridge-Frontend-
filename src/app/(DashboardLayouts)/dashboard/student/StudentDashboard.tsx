@@ -8,6 +8,7 @@ import BrowseTutors from "@/components/studentDashboard/BrowseTutors";
 import StudentBookings from "@/components/studentDashboard/StudentBookings";
 import StudentOverview from "@/components/studentDashboard/StudentOverview";
 import StudentProfile from "@/components/studentDashboard/StudentProfile";
+import StudentReviews from "@/components/studentDashboard/StudentReviews";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function StudentDashboard() {
 
   // Active tab for sidebar navigation
   const [activeTab, setActiveTab] = useState<
-    "overview" | "browseTutors" | "myBookings" | "profile"
+    "overview" | "browseTutors" | "myBookings" | "review" | "profile" 
   >("overview");
 
   // Fetch current student user
@@ -82,6 +83,14 @@ export default function StudentDashboard() {
           </li>
           <li
             className={`p-2 rounded cursor-pointer ${
+              activeTab === "review" ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab("review")}
+          >
+            My Review
+          </li>
+          <li
+            className={`p-2 rounded cursor-pointer ${
               activeTab === "profile" ? "bg-gray-200" : "hover:bg-gray-100"
             }`}
             onClick={() => setActiveTab("profile")}
@@ -107,8 +116,9 @@ export default function StudentDashboard() {
         {activeTab === "myBookings" && user && (
           <StudentBookings studentId={user.id} />
         )}
+        {activeTab === "review" && user?.id && <StudentReviews studentId={user.id} />}
         {activeTab === "profile" && <StudentProfile studentId={user.id} />}
-
+        
       </div>
     </div>
   );
