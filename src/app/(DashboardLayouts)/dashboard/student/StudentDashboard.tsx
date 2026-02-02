@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/services/auth/auth";
 import { logout } from "@/services/auth/authClient";
 import BrowseTutors from "@/components/studentDashboard/BrowseTutors";
 import StudentBookings from "@/components/studentDashboard/StudentBookings";
+import StudentOverview from "@/components/studentDashboard/StudentOverview";
+import StudentProfile from "@/components/studentDashboard/StudentProfile";
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -14,8 +16,8 @@ export default function StudentDashboard() {
 
   // Active tab for sidebar navigation
   const [activeTab, setActiveTab] = useState<
-    "browseTutors" | "myBookings" | "profile"
-  >("browseTutors");
+    "overview" | "browseTutors" | "myBookings" | "profile"
+  >("overview");
 
   // Fetch current student user
   useEffect(() => {
@@ -56,6 +58,14 @@ export default function StudentDashboard() {
         <ul className="space-y-2">
           <li
             className={`p-2 rounded cursor-pointer ${
+              activeTab === "overview" ? "bg-gray-200" : "hover:bg-gray-100"
+            }`}
+            onClick={() => setActiveTab("overview")}
+          >
+            Overview
+          </li>
+          <li
+            className={`p-2 rounded cursor-pointer ${
               activeTab === "browseTutors" ? "bg-gray-200" : "hover:bg-gray-100"
             }`}
             onClick={() => setActiveTab("browseTutors")}
@@ -92,14 +102,13 @@ export default function StudentDashboard() {
         <h1 className="text-2xl font-bold mb-4">
           Welcome, {user.name || "Student"}
         </h1>
-
+        {activeTab === "overview" && <StudentOverview studentId={user.id} />}
         {activeTab === "browseTutors" && <BrowseTutors />}
-        {activeTab === "myBookings" && user && (<StudentBookings studentId={user.id} />)}
-        {activeTab === "profile" && (
-          <div>
-            <p>Student Profile page (coming soon)</p>
-          </div>
+        {activeTab === "myBookings" && user && (
+          <StudentBookings studentId={user.id} />
         )}
+        {activeTab === "profile" && <StudentProfile studentId={user.id} />}
+
       </div>
     </div>
   );
