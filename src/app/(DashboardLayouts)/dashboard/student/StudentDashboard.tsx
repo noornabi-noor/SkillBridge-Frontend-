@@ -9,15 +9,15 @@ import StudentBookings from "@/components/studentDashboard/StudentBookings";
 import StudentOverview from "@/components/studentDashboard/StudentOverview";
 import StudentProfile from "@/components/studentDashboard/StudentProfile";
 import StudentReviews from "@/components/studentDashboard/StudentReviews";
+import Navbar from "@/components/tutorDashboard/Navbar";
 
 export default function StudentDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Active tab for sidebar navigation
   const [activeTab, setActiveTab] = useState<
-    "overview" | "browseTutors" | "myBookings" | "review" | "profile" 
+    "overview" | "browseTutors" | "myBookings" | "review" | "profile"
   >("overview");
 
   // Fetch current student user
@@ -49,76 +49,54 @@ export default function StudentDashboard() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-500 dark:text-gray-300">
+        Loading...
+      </div>
+    );
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow p-4">
-        <h2 className="text-xl font-bold mb-4">Student Dashboard</h2>
+      <aside className="w-64 bg-white dark:bg-gray-800 shadow p-4 transition-colors duration-300">
+        <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+          Student Dashboard
+        </h2>
         <ul className="space-y-2">
-          <li
-            className={`p-2 rounded cursor-pointer ${
-              activeTab === "overview" ? "bg-gray-200" : "hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveTab("overview")}
-          >
-            Overview
-          </li>
-          <li
-            className={`p-2 rounded cursor-pointer ${
-              activeTab === "browseTutors" ? "bg-gray-200" : "hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveTab("browseTutors")}
-          >
-            Browse Tutors
-          </li>
-          <li
-            className={`p-2 rounded cursor-pointer ${
-              activeTab === "myBookings" ? "bg-gray-200" : "hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveTab("myBookings")}
-          >
-            My Bookings
-          </li>
-          <li
-            className={`p-2 rounded cursor-pointer ${
-              activeTab === "review" ? "bg-gray-200" : "hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveTab("review")}
-          >
-            My Review
-          </li>
-          <li
-            className={`p-2 rounded cursor-pointer ${
-              activeTab === "profile" ? "bg-gray-200" : "hover:bg-gray-100"
-            }`}
-            onClick={() => setActiveTab("profile")}
-          >
-            My Profile
-          </li>
+          {[
+            { label: "Overview", key: "overview" },
+            { label: "Browse Tutors", key: "browseTutors" },
+            { label: "My Bookings", key: "myBookings" },
+            { label: "My Review", key: "review" },
+            { label: "My Profile", key: "profile" },
+          ].map((tab) => (
+            <li
+              key={tab.key}
+              className={`p-2 rounded cursor-pointer text-gray-800 dark:text-gray-100 transition-colors duration-200 ${
+                activeTab === tab.key
+                  ? "bg-gray-200 dark:bg-gray-700 font-semibold"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => setActiveTab(tab.key as any)}
+            >
+              {tab.label}
+            </li>
+          ))}
         </ul>
-        <button
-          onClick={handleLogout}
-          className="mt-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
       </aside>
 
       {/* Main content */}
       <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-2xl font-bold mb-4">
-          Welcome, {user.name || "Student"}
-        </h1>
-        {activeTab === "overview" && <StudentOverview studentId={user.id} />}
-        {activeTab === "browseTutors" && <BrowseTutors />}
-        {activeTab === "myBookings" && user && (
-          <StudentBookings studentId={user.id} />
-        )}
-        {activeTab === "review" && user?.id && <StudentReviews studentId={user.id} />}
-        {activeTab === "profile" && <StudentProfile studentId={user.id} />}
-        
+        <Navbar user={user} onLogout={handleLogout} />
+
+        <div className="mt-6">
+          {activeTab === "overview" && <StudentOverview studentId={user.id} />}
+          {activeTab === "browseTutors" && <BrowseTutors />}
+          {activeTab === "myBookings" && <StudentBookings studentId={user.id} />}
+          {activeTab === "review" && <StudentReviews studentId={user.id} />}
+          {activeTab === "profile" && <StudentProfile studentId={user.id} />}
+        </div>
       </div>
     </div>
   );

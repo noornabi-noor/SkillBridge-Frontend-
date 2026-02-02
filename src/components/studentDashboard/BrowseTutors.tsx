@@ -45,17 +45,14 @@ export default function BrowseTutors() {
     setLoading(true);
     try {
       // Fetch tutors
-      const tutorsRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/tutors`,
-      );
+      const tutorsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tutors`);
       const tutorsData = await tutorsRes.json();
       setTutors(tutorsData.data || []);
 
-      // Fetch student bookings
-      const bookingsRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings`,
-        { credentials: "include" },
-      );
+      // Fetch bookings
+      const bookingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
+        credentials: "include",
+      });
       const bookingsData = await bookingsRes.json();
       setBookings(bookingsData.data || []);
     } catch (err) {
@@ -67,20 +64,13 @@ export default function BrowseTutors() {
 
   const allCategories = useMemo(() => {
     const set = new Set<string>();
-    tutors.forEach((t) =>
-      t.categories?.forEach((c) => set.add(c.category.name)),
-    );
+    tutors.forEach((t) => t.categories?.forEach((c) => set.add(c.category.name)));
     return ["ALL", ...Array.from(set)];
   }, [tutors]);
 
   const filteredTutors = useMemo(() => {
     if (selectedCategory === "ALL") return tutors;
-
-    return tutors.filter((t) =>
-      t.categories?.some(
-        (c) => c.category.name === selectedCategory,
-      ),
-    );
+    return tutors.filter((t) => t.categories?.some((c) => c.category.name === selectedCategory));
   }, [tutors, selectedCategory]);
 
   const handleBook = async () => {
@@ -90,20 +80,17 @@ export default function BrowseTutors() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            tutorId: selectedTutor.id,
-            date: new Date(bookingDate),
-            startTime: bookingTime,
-            endTime: bookingTime,
-          }),
-        },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          tutorId: selectedTutor.id,
+          date: new Date(bookingDate),
+          startTime: bookingTime,
+          endTime: bookingTime,
+        }),
+      });
 
       if (!res.ok) throw new Error(await res.text());
 
@@ -124,15 +111,16 @@ export default function BrowseTutors() {
   if (loading) return <p>Loading tutors...</p>;
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold mb-4">Browse Tutors</h2>
+    <div className="min-h-screen p-6">
+      <h2 className="text-xl font-bold mb-4 dark:text-white">Browse Tutors</h2>
 
+      {/* Category Filter */}
       <div className="mb-4">
-        <label className="mr-2 font-medium">Filter by Category:</label>
+        <label className="mr-2 font-medium dark:text-gray-200">Filter by Category:</label>
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border px-3 py-1 rounded"
+          className="border px-3 py-1 rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
         >
           {allCategories.map((cat) => (
             <option key={cat} value={cat}>
@@ -142,42 +130,31 @@ export default function BrowseTutors() {
         </select>
       </div>
 
+      {/* Tutors List */}
       <ul>
         {filteredTutors.map((tutor) => {
           const status = getBookingStatus(tutor.id);
-
           return (
             <li
               key={tutor.id}
-              className="border p-4 mb-4 rounded shadow-sm flex gap-4 items-start"
+              className="border p-4 mb-4 rounded shadow-sm flex gap-4 items-start dark:bg-gray-800 dark:border-gray-700"
             >
-              {/* Avatar */}
               <img
                 src={tutor.user?.image || "/avatar.png"}
                 alt={tutor.user?.name}
                 className="w-16 h-16 rounded-full object-cover"
               />
 
-              {/* Tutor Info */}
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">
-                  {tutor.user?.name}
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {tutor.user?.email}
-                </p>
-                <p className="mt-2 text-sm">
-                  {tutor.bio || "No bio available"}
-                </p>
-                <p className="mt-1 text-sm">
+                <h2 className="text-lg font-semibold dark:text-white">{tutor.user?.name}</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{tutor.user?.email}</p>
+                <p className="mt-2 text-sm dark:text-gray-300">{tutor.bio || "No bio available"}</p>
+                <p className="mt-1 text-sm dark:text-gray-300">
                   <strong>Categories:</strong>{" "}
-                  {tutor.categories
-                    ?.map((c) => c.category.name)
-                    .join(", ") || "N/A"}
+                  {tutor.categories?.map((c) => c.category.name).join(", ") || "N/A"}
                 </p>
-                <p className="mt-1 text-sm">
-                  <strong>Rate:</strong> $
-                  {tutor.pricePerHour || 0}/hr
+                <p className="mt-1 text-sm dark:text-gray-300">
+                  <strong>Rate:</strong> ${tutor.pricePerHour || 0}/hr
                 </p>
 
                 {status ? (
@@ -195,7 +172,7 @@ export default function BrowseTutors() {
                 ) : (
                   <button
                     onClick={() => setSelectedTutor(tutor)}
-                    className="mt-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded"
+                    className="mt-3 px-4 py-1 rounded text-white bg-blue-500 hover:bg-blue-600"
                   >
                     Book
                   </button>
@@ -208,33 +185,31 @@ export default function BrowseTutors() {
 
       {/* Booking Modal */}
       {selectedTutor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded w-80">
-            <h3 className="text-lg font-semibold mb-2">
-              Book {selectedTutor.user.name}
-            </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="p-6 rounded w-80 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold mb-2">Book {selectedTutor.user.name}</h3>
             <input
               type="date"
               value={bookingDate}
               onChange={(e) => setBookingDate(e.target.value)}
-              className="border px-2 py-1 w-full rounded mb-2"
+              className="border px-2 py-1 w-full rounded mb-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
             <input
               type="time"
               value={bookingTime}
               onChange={(e) => setBookingTime(e.target.value)}
-              className="border px-2 py-1 w-full rounded mb-4"
+              className="border px-2 py-1 w-full rounded mb-4 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
             <div className="flex justify-between">
               <button
                 onClick={handleBook}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               >
                 Confirm
               </button>
               <button
                 onClick={() => setSelectedTutor(null)}
-                className="bg-gray-400 text-white px-4 py-2 rounded"
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
               >
                 Cancel
               </button>

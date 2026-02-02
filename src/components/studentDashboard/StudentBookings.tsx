@@ -36,19 +36,14 @@ export default function StudentBookings({ studentId }: Props) {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings`,
-        { credentials: "include" },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
+        credentials: "include",
+      });
       const data = await res.json();
 
-      const allBookings: Booking[] = Array.isArray(data.data)
-        ? data.data
-        : [];
+      const allBookings: Booking[] = Array.isArray(data.data) ? data.data : [];
 
-      const studentBookings = allBookings.filter(
-        (b) => b.studentId === studentId,
-      );
+      const studentBookings = allBookings.filter((b) => b.studentId === studentId);
 
       setBookings(studentBookings);
     } catch (err) {
@@ -59,25 +54,20 @@ export default function StudentBookings({ studentId }: Props) {
     }
   };
 
-  // ✅ NEW: cancel booking
   const handleCancelBooking = async (bookingId: string) => {
     const ok = confirm("Are you sure you want to cancel this booking?");
     if (!ok) return;
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ status: "CANCELLED" }),
-        },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "CANCELLED" }),
+      });
 
       if (!res.ok) throw new Error("Cancel failed");
 
-      // Refresh bookings
       fetchBookings();
     } catch (err) {
       console.error(err);
@@ -85,28 +75,26 @@ export default function StudentBookings({ studentId }: Props) {
     }
   };
 
-  if (loading) return <p>Loading bookings...</p>;
+  if (loading) return <p className="dark:text-gray-300">Loading bookings...</p>;
 
   return (
-    <div className="bg-white p-4 rounded shadow mb-6">
-      <h2 className="text-lg font-semibold mb-4">My Bookings</h2>
+    <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6 transition-colors duration-300">
+      <h2 className="text-lg font-semibold mb-4 dark:text-white">My Bookings</h2>
 
       {bookings.length === 0 ? (
-        <p>No bookings yet.</p>
+        <p className="dark:text-gray-300">No bookings yet.</p>
       ) : (
         <ul className="space-y-2">
           {bookings.map((b) => (
             <li
               key={b.id}
-              className="border p-3 rounded flex justify-between items-center"
+              className="border p-3 rounded flex justify-between items-center dark:border-gray-700 dark:bg-gray-700 transition-colors duration-300"
             >
               <div>
-                <strong>
-                  {b.tutor?.user?.name ||
-                    b.tutor?.name ||
-                    "Unknown Tutor"}
+                <strong className="dark:text-white">
+                  {b.tutor?.user?.name || b.tutor?.name || "Unknown Tutor"}
                 </strong>
-                <div className="text-gray-500 text-sm">
+                <div className="text-gray-500 dark:text-gray-300 text-sm">
                   {new Date(b.date).toLocaleDateString()} at {b.startTime}
                 </div>
               </div>
