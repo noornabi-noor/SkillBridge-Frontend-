@@ -39,3 +39,4 @@ export async function getAllUsers() {
 
   return json.data;
 }
+

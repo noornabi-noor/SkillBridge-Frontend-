@@ -111,21 +111,42 @@ export async function getTutorUpcomingBookings(tutorProfileId: string) {
   return (await res.json()).data;
 }
 
-export async function getTutorDashboardStats(userId: string, userProfile: any) {
-  //  Get Tutor Profile by userId
-  const profile = await getTutorProfile(userId, userProfile);
-  const tutorProfileId = profile.id;
 
-  //  Fetch bookings, upcoming bookings, and reviews
-  const [bookings, upcomingBookings, reviews] = await Promise.all([
-    getTutorBookings(tutorProfileId),
-    getTutorUpcomingBookings(tutorProfileId),
-    getTutorReviews(tutorProfileId),
-  ]);
+export async function getTutorDashboardStats(userId: string) {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 
-  // Calculate totals and average rating
+  const res = await fetch(`${API_URL}/api/tutors/dashboard/${userId}`, {
+    headers: { Cookie: cookieHeader },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to load tutor dashboard stats");
+  }
+
+  const dashboard = (await res.json()).data;
+
+ 
+  const user = dashboard.user;       
+  const profile = dashboard.profile;
+
+  const tutorProfileId = profile?.id;
+
+  const [bookings, upcomingBookings, reviews] = tutorProfileId
+    ? await Promise.all([
+        getTutorBookings(tutorProfileId),
+        getTutorUpcomingBookings(tutorProfileId),
+        getTutorReviews(tutorProfileId),
+      ])
+    : [[], [], []];
+
   const totalBookings = bookings.length;
   const totalReviews = reviews.length;
+
   const averageRating =
     totalReviews === 0
       ? 0
@@ -135,17 +156,16 @@ export async function getTutorDashboardStats(userId: string, userProfile: any) {
             0,
           ) / totalReviews,
         ).toFixed(1);
-
-  const upcomingSessions = upcomingBookings.length;
-
+        
   return {
+    user,                 
     profile,
     bookings,
     reviews,
     totalBookings,
     totalReviews,
     averageRating,
-    upcomingSessions,
+    upcomingSessions: upcomingBookings.length,
     upcomingSessionsList: upcomingBookings,
   };
 }
