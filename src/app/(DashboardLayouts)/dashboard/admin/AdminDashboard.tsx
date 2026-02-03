@@ -15,6 +15,7 @@ import { logout } from "@/services/auth/authClient";
 import AdminSidebar from "@/components/adminDashboard/adminSidebar";
 import AdminBookingsTable from "@/components/adminDashboard/AdminBookingsTable";
 import AdminCategoriesTable from "@/components/adminDashboard/AdminCategoriesTable";
+import AdminReviewsTable from "@/components/adminDashboard/AdminReviewsTable";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -23,10 +24,11 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "bookings" | "categories"
+    "overview" | "users" | "bookings" | "categories" | "reviews"
   >("overview");
 
   // Persist active tab (same as tutor)
@@ -36,6 +38,7 @@ export default function AdminDashboard() {
       | "users"
       | "bookings"
       | "categories"
+      | "reviews"
       | null;
     if (saved) setActiveTab(saved);
   }, []);
@@ -136,6 +139,12 @@ export default function AdminDashboard() {
         {activeTab === "categories" && (
           <div className="mt-6">
             <AdminCategoriesTable />
+          </div>
+        )}
+
+        {activeTab === "reviews" && (
+          <div className="mt-6">
+            <AdminReviewsTable />
           </div>
         )}
       </div>

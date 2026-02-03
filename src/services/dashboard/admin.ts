@@ -210,3 +210,40 @@ export async function updateCategoryAdmin(
 
   return (await res.json()).data;
 }
+
+export async function getAllReviewsAdmin() {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+
+  const res = await fetch(`${API_URL}/api/reviews/admin`, {
+    headers: { Cookie: cookieHeader },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("Get all reviews error:", err);
+    throw new Error(err.message || "Failed to load reviews");
+  }
+
+  return (await res.json()).data;
+}
+
+export async function deleteReviewAdmin(reviewId: string) {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+
+  const res = await fetch(`${API_URL}/api/reviews/admin/${reviewId}`, {
+    method: "DELETE",
+    headers: { Cookie: cookieHeader },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("Delete review error:", err);
+    throw new Error(err.message || "Failed to delete review");
+  }
+
+  return (await res.json()).data;
+}
