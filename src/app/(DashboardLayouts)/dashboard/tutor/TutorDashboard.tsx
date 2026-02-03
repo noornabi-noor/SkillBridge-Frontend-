@@ -54,7 +54,7 @@ export default function TutorDashboard() {
         }
         setUser(currentUser);
 
-        const dashboard = await getTutorDashboardStats(currentUser.id, currentUser);
+        const dashboard = await getTutorDashboardStats(currentUser.id);
         setStats(dashboard);
       } catch (err) {
         console.error(err);
@@ -86,7 +86,7 @@ export default function TutorDashboard() {
 
         {activeTab === "overview" && <OverviewCards stats={stats} />}
         {activeTab === "profile" && (
-          <TutorProfile stats={stats} setStats={setStats} user={user} />
+          <TutorProfile stats={stats} setStats={setStats} />
         )}
         {activeTab === "availability" && (
           <TutorAvailability tutorId={stats.profile.id} />

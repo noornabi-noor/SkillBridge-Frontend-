@@ -1,8 +1,144 @@
-// app/(DashboardLayouts)/dashboard/admin/AdminDashboard.tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import Navbar from "@/components/tutorDashboard/Navbar";
+import AdminUsersTable from "@/components/adminDashboard/AdminUsersTable";
+import {
+  getAllBookingsAdmin,
+  getAllCategoriesAdmin,
+  getAllUsersAdmin,
+} from "@/services/dashboard/admin";
+import { getCurrentUser } from "@/services/auth/auth";
+import { logout } from "@/services/auth/authClient";
+import AdminSidebar from "@/components/adminDashboard/adminSidebar";
+import AdminBookingsTable from "@/components/adminDashboard/AdminBookingsTable";
+import AdminCategoriesTable from "@/components/adminDashboard/AdminCategoriesTable";
+
 export default function AdminDashboard() {
+  const router = useRouter();
+
+  const [user, setUser] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "users" | "bookings" | "categories"
+  >("overview");
+
+  // Persist active tab (same as tutor)
+  useEffect(() => {
+    const saved = localStorage.getItem("adminActiveTab") as
+      | "overview"
+      | "users"
+      | "bookings"
+      | "categories"
+      | null;
+    if (saved) setActiveTab(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("adminActiveTab", activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser || currentUser.role !== "ADMIN") {
+          router.push("/login");
+          return;
+        }
+
+        setUser(currentUser);
+
+        const allUsers = await getAllUsersAdmin();
+        setUsers(allUsers);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab !== "bookings") return;
+
+    async function fetchBookings() {
+      try {
+        const allBookings = await getAllBookingsAdmin();
+        setBookings(allBookings);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchBookings();
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "categories") return;
+
+    async function fetchCategories() {
+      try {
+        const allCategories = await getAllCategoriesAdmin();
+        setCategories(allCategories);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchCategories();
+  }, [activeTab]);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+    router.refresh();
+  };
+
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-950">
+      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      <div className="flex-1 p-6 overflow-auto">
+        <Navbar user={user} onLogout={handleLogout} />
+
+        {activeTab === "overview" && (
+          <div className="mt-6 text-gray-800 dark:text-gray-200">
+            <h2 className="text-xl font-semibold mb-4">Admin Overview</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Manage platform users and control access.
+            </p>
+          </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="mt-6">
+            <AdminUsersTable initialUsers={users} />
+          </div>
+        )}
+
+        {activeTab === "bookings" && (
+          <div className="mt-6">
+            <AdminBookingsTable initialBookings={bookings} />
+          </div>
+        )}
+
+        {activeTab === "categories" && (
+          <div className="mt-6">
+            <AdminCategoriesTable />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
