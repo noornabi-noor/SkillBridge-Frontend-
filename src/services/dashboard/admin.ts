@@ -4,10 +4,6 @@ import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-/* =========================
-   USER MANAGEMENT (existing)
-========================= */
-
 export async function getAllUsersAdmin() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -54,10 +50,6 @@ export async function updateUserStatus(
   return (await res.json()).data;
 }
 
-/* =========================
-   BOOKING MANAGEMENT (NEW)
-========================= */
-
 export async function getAllBookingsAdmin() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -103,7 +95,6 @@ export async function updateBookingStatusAdmin(
 
   return (await res.json()).data;
 }
-
 
 export async function getAllCategoriesAdmin() {
   const cookieStore = await cookies();
@@ -178,10 +169,7 @@ export async function deleteCategoryAdmin(categoryId: string) {
 
 export async function updateCategoryAdmin(
   categoryId: string,
-  data: {
-    name?: string;
-    tutorIds?: string[];
-  },
+  data: { name?: string; tutorIds?: string[] }
 ) {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -189,18 +177,15 @@ export async function updateCategoryAdmin(
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const res = await fetch(
-    `${API_URL}/api/categories/${categoryId}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader,
-      },
-      body: JSON.stringify(data),
-      cache: "no-store",
+  const res = await fetch(`${API_URL}/api/categories/${categoryId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookieHeader,
     },
-  );
+    body: JSON.stringify(data),
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     const err = await res.json();
@@ -230,19 +215,49 @@ export async function getAllReviewsAdmin() {
 }
 
 export async function deleteReviewAdmin(reviewId: string) {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
 
-  const res = await fetch(`${API_URL}/api/reviews/admin/${reviewId}`, {
-    method: "DELETE",
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+
+
+  const res = await fetch(
+    `${API_URL}/api/reviews/admin/${reviewId}`,
+    {
+      method: "DELETE",
+      credentials: "include", 
+      headers: {
+      Cookie: cookieHeader,
+    },
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error("Delete review error:", err);
+    throw new Error(err.message || "Failed to delete review");
+  }
+
+  return (await res.json()).data;
+}
+
+export async function getAdminDashboardStats() {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+
+  const res = await fetch(`${API_URL}/api/admin/dashboard`, {
     headers: { Cookie: cookieHeader },
     cache: "no-store",
   });
 
   if (!res.ok) {
     const err = await res.json();
-    console.error("Delete review error:", err);
-    throw new Error(err.message || "Failed to delete review");
+    throw new Error(err.message || "Failed to fetch dashboard stats");
   }
 
   return (await res.json()).data;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getAllReviewsAdmin, deleteReviewAdmin } from "@/services/dashboard/admin";
+import { toast } from "sonner";
 
 export default function AdminReviewsTable() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -12,8 +13,9 @@ export default function AdminReviewsTable() {
       try {
         const allReviews = await getAllReviewsAdmin();
         setReviews(allReviews);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        toast.error("Failed to load reviews");
       } finally {
         setLoading(false);
       }
@@ -28,9 +30,10 @@ export default function AdminReviewsTable() {
     try {
       await deleteReviewAdmin(id);
       setReviews(reviews.filter((r) => r.id !== id));
-    } catch (err) {
+      toast.success("Review deleted successfully");
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to delete review");
+      toast.error(err.message || "Failed to delete review");
     }
   };
 
@@ -41,8 +44,8 @@ export default function AdminReviewsTable() {
       {reviews.map((review) => (
         <div key={review.id} className="flex items-center justify-between p-3 border rounded dark:border-gray-800">
           <div>
-            <p><strong>Student:</strong> {review.student?.name}</p>
-            <p><strong>Tutor:</strong> {review.tutor?.user?.name}</p>
+            <p><strong>Student:</strong> {review.student?.name ?? "N/A"}</p>
+            <p><strong>Tutor:</strong> {review.tutor?.user?.name ?? "N/A"}</p>
             <p><strong>Rating:</strong> {review.rating}</p>
             <p><strong>Comment:</strong> {review.comment || "-"}</p>
           </div>

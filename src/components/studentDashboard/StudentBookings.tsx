@@ -35,24 +35,23 @@ export default function StudentBookings({ studentId }: Props) {
   }, [studentId]);
 
   const fetchBookings = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
-        credentials: "include",
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`, {
+      credentials: "include",
+    });
 
-      const allBookings: Booking[] = Array.isArray(data.data) ? data.data : [];
+    if (!res.ok) throw new Error("Failed to fetch bookings");
 
-      const studentBookings = allBookings.filter((b) => b.studentId === studentId);
+    const data = await res.json();
+    setBookings(Array.isArray(data.data) ? data.data : []);
+  } catch (err) {
+    console.error(err);
+    setBookings([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
-      setBookings(studentBookings);
-    } catch (err) {
-      console.error(err);
-      setBookings([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCancelBooking = async (bookingId: string) => {
     const ok = confirm("Are you sure you want to cancel this booking?");

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { updateBookingStatusAdmin } from "@/services/dashboard/admin";
+import { toast } from "sonner";
 
 type Booking = {
   id: string;
@@ -9,15 +10,15 @@ type Booking = {
   startTime: string;
   endTime: string;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
-  tutor: {
-    user: {
-      name: string;
-      email: string;
+  tutor?: {
+    user?: {
+      name?: string;
+      email?: string;
     };
   };
-  student: {
-    name: string;
-    email: string;
+  student?: {
+    name?: string;
+    email?: string;
   };
 };
 
@@ -28,29 +29,43 @@ export default function AdminBookingsTable({
 }) {
   const [bookings, setBookings] = useState(initialBookings);
   const [filter, setFilter] = useState<"ALL" | Booking["status"]>("ALL");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const filteredBookings = useMemo(() => {
     if (filter === "ALL") return bookings;
     return bookings.filter((b) => b.status === filter);
   }, [bookings, filter]);
 
+  // STATUS UPDATE WITH TOAST
   const handleStatusChange = async (
     bookingId: string,
-    status: Booking["status"],
+    status: Booking["status"]
   ) => {
-    const updated = await updateBookingStatusAdmin(bookingId, status);
-    setBookings((prev) =>
-      prev.map((b) => (b.id === bookingId ? updated : b)),
-    );
+    try {
+      setUpdatingId(bookingId);
+
+      const updated = await updateBookingStatusAdmin(bookingId, status);
+
+      // keep relations, update only status
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === bookingId ? { ...b, status: updated.status } : b
+        )
+      );
+
+      toast.success(`Booking updated to ${updated.status}`);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update booking");
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow">
       {/* HEADER */}
       <div className="flex justify-between items-center p-4 border-b dark:border-gray-800">
-        <h2 className="font-semibold dark:text-white">
-          All Bookings
-        </h2>
+        <h2 className="font-semibold dark:text-white">All Bookings</h2>
 
         <select
           value={filter}
@@ -81,25 +96,24 @@ export default function AdminBookingsTable({
 
           <tbody>
             {filteredBookings.map((b) => (
-              <tr
-                key={b.id}
-                className="border-b dark:border-gray-800"
-              >
+              <tr key={b.id} className="border-b dark:border-gray-800">
+                {/* STUDENT */}
                 <td className="p-3">
                   <p className="font-medium dark:text-white">
-                    {b.student.name}
+                    {b.student?.name ?? "N/A"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {b.student.email}
+                    {b.student?.email ?? "N/A"}
                   </p>
                 </td>
 
+                {/* TUTOR */}
                 <td className="p-3">
                   <p className="font-medium dark:text-white">
-                    {b.tutor.user.name}
+                    {b.tutor?.user?.name ?? "N/A"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {b.tutor.user.email}
+                    {b.tutor?.user?.email ?? "N/A"}
                   </p>
                 </td>
 
@@ -111,20 +125,19 @@ export default function AdminBookingsTable({
                   {b.startTime} - {b.endTime}
                 </td>
 
-                <td className="p-3 text-center">
-                  {b.status}
-                </td>
+                <td className="p-3 text-center">{b.status}</td>
 
                 <td className="p-3">
                   <select
                     value={b.status}
+                    disabled={updatingId === b.id}
                     onChange={(e) =>
                       handleStatusChange(
                         b.id,
-                        e.target.value as Booking["status"],
+                        e.target.value as Booking["status"]
                       )
                     }
-                    className="border px-2 py-1 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                    className="border px-2 py-1 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white disabled:opacity-50"
                   >
                     <option value="PENDING">Pending</option>
                     <option value="CONFIRMED">Confirmed</option>
@@ -137,10 +150,7 @@ export default function AdminBookingsTable({
 
             {filteredBookings.length === 0 && (
               <tr>
-                <td
-                  colSpan={6}
-                  className="p-6 text-center text-gray-500"
-                >
+                <td colSpan={6} className="p-6 text-center text-gray-500">
                   No bookings found
                 </td>
               </tr>

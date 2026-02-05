@@ -7,15 +7,17 @@ import {
   getAllCategoriesAdmin,
 } from "@/services/dashboard/admin";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AdminCategoriesTable() {
   const [categories, setCategories] = useState<any[]>([]);
   const [name, setName] = useState("");
-  const [editingNames, setEditingNames] = useState<{ [key: string]: string }>(
-    {},
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null
   );
+  const [editingName, setEditingName] = useState("");
 
-  // FETCH ALL CATEGORIES on mount
+  // FETCH ALL CATEGORIES
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -26,7 +28,6 @@ export default function AdminCategoriesTable() {
         alert("Failed to fetch categories");
       }
     }
-
     fetchCategories();
   }, []);
 
@@ -35,12 +36,11 @@ export default function AdminCategoriesTable() {
     const trimmedName = name.trim();
     if (!trimmedName) return;
 
-    // Check if category already exists in the frontend list (case-insensitive)
     const exists = categories.some(
-      (c) => c.name.toLowerCase() === trimmedName.toLowerCase(),
+      (c) => c.name.toLowerCase() === trimmedName.toLowerCase()
     );
     if (exists) {
-      alert(`Category "${trimmedName}" already exists`);
+      toast.error(`Category "${trimmedName}" already exists`);
       return;
     }
 
@@ -48,23 +48,43 @@ export default function AdminCategoriesTable() {
       const newCategory = await createCategoryAdmin(trimmedName);
       setCategories([newCategory, ...categories]);
       setName("");
+      toast.success(`Category "${trimmedName}" created`);
     } catch (err: any) {
-      console.error("Failed to create category:", err);
-      alert(err.message || "Failed to create category");
+      toast.error(err.message || "Failed to create category");
     }
   };
 
-  // UPDATE
-  const handleUpdate = async (id: string) => {
-    const value = editingNames[id];
-    if (!value?.trim()) return;
+  // START EDIT
+  const startEditing = (id: string, currentName: string) => {
+    setEditingCategoryId(id);
+    setEditingName(currentName);
+  };
+
+  // CANCEL EDIT
+  const cancelEditing = () => {
+    setEditingCategoryId(null);
+    setEditingName("");
+  };
+
+  // SAVE UPDATE
+  const saveUpdate = async (id: string) => {
+    const trimmedName = editingName.trim();
+    if (!trimmedName) {
+      toast.error("Name cannot be empty");
+      return;
+    }
 
     try {
-      const updated = await updateCategoryAdmin(id, { name: value });
-      setCategories(categories.map((c) => (c.id === id ? updated : c)));
-    } catch (err) {
+      const updated = await updateCategoryAdmin(id, { name: trimmedName });
+      setCategories(
+        categories.map((c) => (c.id === id ? updated : c))
+      );
+      setEditingCategoryId(null);
+      setEditingName("");
+      toast.success(`Category updated to "${updated.name}"`);
+    } catch (err: any) {
       console.error("Failed to update category:", err);
-      alert("Failed to update category");
+      toast.error(err.message || "Failed to update category");
     }
   };
 
@@ -75,9 +95,10 @@ export default function AdminCategoriesTable() {
     try {
       await deleteCategoryAdmin(id);
       setCategories(categories.filter((c) => c.id !== id));
-    } catch (err) {
+      toast.success("Category deleted successfully");
+    } catch (err: any) {
       console.error("Failed to delete category:", err);
-      alert("Failed to delete category");
+      toast.error(err.message || "Failed to delete category");
     }
   };
 
@@ -104,26 +125,51 @@ export default function AdminCategoriesTable() {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="flex items-center justify-between p-3 border rounded dark:border-gray-800"
+            className="flex items-center justify-between p-3 border rounded dark:border-gray-800 gap-2"
           >
-            <input
-              value={editingNames[cat.id] ?? cat.name}
-              onChange={(e) =>
-                setEditingNames({
-                  ...editingNames,
-                  [cat.id]: e.target.value,
-                })
-              }
-              onBlur={() => handleUpdate(cat.id)}
-              className="bg-transparent outline-none dark:text-white flex-1"
-            />
+            {/* CATEGORY NAME */}
+            {editingCategoryId === cat.id ? (
+              <input
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                className="flex-1 px-2 py-1 border rounded dark:bg-gray-900 dark:text-white"
+              />
+            ) : (
+              <span className="flex-1">{cat.name}</span>
+            )}
 
-            <button
-              onClick={() => handleDelete(cat.id)}
-              className="text-red-500 hover:underline ml-2"
-            >
-              Delete
-            </button>
+            {/* BUTTONS */}
+            {editingCategoryId === cat.id ? (
+              <>
+                <button
+                  onClick={() => saveUpdate(cat.id)}
+                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={cancelEditing}
+                  className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => startEditing(cat.id, cat.name)}
+                  className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => handleDelete(cat.id)}
+                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         ))}
       </div>

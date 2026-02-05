@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateUserStatus } from "@/services/dashboard/admin";
 import UserDetails from "./UserDetails";
+import { toast } from "sonner";
 
 export default function AdminUsersTable({
   initialUsers,
@@ -28,6 +29,7 @@ export default function AdminUsersTable({
       const updatedUser = await updateUserStatus(user.id, newStatus);
 
       setUsers((prev) => prev.map((u) => (u.id === user.id ? updatedUser : u)));
+      toast.success("User status set successfully!");
 
       if (selectedUser?.id === user.id) {
         setSelectedUser(updatedUser);
@@ -111,12 +113,24 @@ export default function AdminUsersTable({
                 </td>
                 <td className="py-3 text-gray-600 dark:text-gray-400">
                   {user.email}
-                </td>
+                </td>               
+
                 <td className="py-3">
-                  <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-semibold ${
+                      user.role === "ADMIN"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                        : user.role === "TUTOR"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                          : user.role === "STUDENT"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                            : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                    }`}
+                  >
                     {user.role}
                   </span>
                 </td>
+
                 <td className="py-3">
                   {user.status === "BANNED" ? (
                     <span className="px-2 py-1 rounded text-xs bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
@@ -176,7 +190,6 @@ export default function AdminUsersTable({
           onClose={() => setSelectedUser(null)}
         />
       )}
-
     </div>
   );
 }

@@ -1,5 +1,6 @@
 // app/(DashboardLayouts)/dashboard/layout.tsx
 
+import ToastProvider from "@/components/providers/ToastProvider";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { getCurrentUser } from "@/services/auth/auth";
 import { redirect } from "next/navigation";
@@ -11,7 +12,7 @@ export default async function DashboardLayout({
 }) {
   const user = await getCurrentUser();
 
-  if (!user) redirect("/login"); // only allow logged-in users
+  if (!user) redirect("/login"); 
 
   return <div className="dashboard-layout">
     <ThemeProvider
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <ToastProvider />
             {children}
           </ThemeProvider>
   </div>;

@@ -40,10 +40,7 @@ export async function getTutorProfile(tutorId: string, userProfile: any) {
 
 export async function getTutorBookings(tutorProfileId: string) {
   const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
 
   const res = await fetch(`${API_URL}/api/bookings/tutor/${tutorProfileId}`, {
     headers: {
@@ -53,12 +50,11 @@ export async function getTutorBookings(tutorProfileId: string) {
     cache: "no-store",
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to load tutor bookings");
-  }
+  if (!res.ok) throw new Error("Failed to load tutor bookings");
 
   return (await res.json()).data;
 }
+
 
 // Tutor Reviews (uses reviewRouter GET /)
 export async function getTutorReviews(tutorId: string) {
@@ -90,27 +86,20 @@ export async function getTutorReviews(tutorId: string) {
 
 export async function getTutorUpcomingBookings(tutorProfileId: string) {
   const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
 
-  const res = await fetch(
-    `${API_URL}/api/bookings/tutor/${tutorProfileId}/upcoming`,
-    {
-      headers: {
-        Cookie: cookieHeader,
-        Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-      },
-      cache: "no-store",
+  const res = await fetch(`${API_URL}/api/bookings/tutor/${tutorProfileId}/upcoming`, {
+    headers: {
+      Cookie: cookieHeader,
+      Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     },
-  );
+    cache: "no-store",
+  });
 
   if (!res.ok) throw new Error("Failed to load upcoming bookings");
 
   return (await res.json()).data;
 }
-
 
 export async function getTutorDashboardStats(userId: string) {
   const cookieStore = await cookies();
@@ -130,10 +119,10 @@ export async function getTutorDashboardStats(userId: string) {
 
   const dashboard = (await res.json()).data;
 
- 
   const user = dashboard.user;       
   const profile = dashboard.profile;
 
+  // ✅ Use tutorProfile.id for fetching bookings/reviews
   const tutorProfileId = profile?.id;
 
   const [bookings, upcomingBookings, reviews] = tutorProfileId
@@ -151,14 +140,12 @@ export async function getTutorDashboardStats(userId: string) {
     totalReviews === 0
       ? 0
       : Number(
-          reviews.reduce(
-            (sum: number, r: { rating: number }) => sum + r.rating,
-            0,
-          ) / totalReviews,
+          reviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) /
+          totalReviews
         ).toFixed(1);
-        
+
   return {
-    user,                 
+    user,
     profile,
     bookings,
     reviews,

@@ -1,8 +1,8 @@
 "use client";
 
 interface AdminSidebarProps {
-  activeTab: "overview" | "users" | "bookings" | "categories" | "reviews";
-  setActiveTab: (tab: "overview" | "users" | "bookings" | "categories" | "reviews") => void;
+  activeTab: "overview" | "users" | "bookings" | "categories" | "reviews" | "profile";
+  setActiveTab: (tab: "overview" | "users" | "bookings" | "categories" | "reviews" | "profile") => void;
 }
 
 export default function AdminSidebar({
@@ -15,6 +15,7 @@ export default function AdminSidebar({
     { label: "Bookings", key: "bookings" },
     { label: "Categories", key: "categories" },
     { label: "Reviews", key: "reviews" },
+    { label: "Profile", key: "profile" },
   ];
 
   return (

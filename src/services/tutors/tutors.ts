@@ -14,7 +14,6 @@ export async function getAllTutors() {
   return json.data;
 }
 
-
 export async function getSingleTutor(id: string) {
   const res = await fetch(`${API_URL}/api/tutors/${id}`, { cache: "no-store" });
   if (!res.ok) {
@@ -24,7 +23,6 @@ export async function getSingleTutor(id: string) {
   const json = await res.json();
   return json.data;
 }
-
 
 export async function getAllUsers() {
   const res = await fetch(`${API_URL}/api/users`, {

@@ -16,6 +16,8 @@ import AdminSidebar from "@/components/adminDashboard/adminSidebar";
 import AdminBookingsTable from "@/components/adminDashboard/AdminBookingsTable";
 import AdminCategoriesTable from "@/components/adminDashboard/AdminCategoriesTable";
 import AdminReviewsTable from "@/components/adminDashboard/AdminReviewsTable";
+import AdminOverview from "@/components/adminDashboard/AdminOverview";
+import AdminProfile from "@/components/adminDashboard/AdminProfile";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -25,10 +27,11 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "bookings" | "categories" | "reviews"
+    "overview" | "users" | "bookings" | "categories" | "reviews" | "profile"
   >("overview");
 
   // Persist active tab (same as tutor)
@@ -39,6 +42,7 @@ export default function AdminDashboard() {
       | "bookings"
       | "categories"
       | "reviews"
+      | "profile"
       | null;
     if (saved) setActiveTab(saved);
   }, []);
@@ -116,11 +120,8 @@ export default function AdminDashboard() {
         <Navbar user={user} onLogout={handleLogout} />
 
         {activeTab === "overview" && (
-          <div className="mt-6 text-gray-800 dark:text-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Admin Overview</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Manage platform users and control access.
-            </p>
+          <div className="mt-6">
+            <AdminOverview />
           </div>
         )}
 
@@ -145,6 +146,12 @@ export default function AdminDashboard() {
         {activeTab === "reviews" && (
           <div className="mt-6">
             <AdminReviewsTable />
+          </div>
+        )}
+
+        {activeTab === "profile" && (
+          <div className="mt-6">
+            <AdminProfile />
           </div>
         )}
       </div>
