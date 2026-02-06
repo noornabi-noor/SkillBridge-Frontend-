@@ -3,7 +3,6 @@
 import { getTutorDashboardStats } from "@/services/dashboard/tutor";
 import { useState } from "react";
 
-
 interface TutorProfileProps {
   stats: any;
   setStats: (stats: any) => void;
@@ -30,7 +29,6 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
 
   const handleSave = async () => {
     try {
-      // 1️⃣ Update main user info
       const userRes = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${stats.user.id}`,
         {
@@ -48,7 +46,6 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
 
       if (!userRes.ok) throw new Error("Failed to update main profile");
 
-      // 2️⃣ Update tutor-specific info
       if (
         stats?.profile ||
         formData.bio ||
@@ -79,9 +76,8 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
         if (!tutorRes.ok) throw new Error("Failed to update tutor profile");
       }
 
-      // 3️⃣ Refresh stats from backend
       const updatedStats = await getTutorDashboardStats(stats.user.id);
-      setStats(updatedStats); // ✅ Updated user & tutor info
+      setStats(updatedStats); 
       setIsEditing(false);
       alert("Profile updated successfully ✅");
     } catch (err: any) {

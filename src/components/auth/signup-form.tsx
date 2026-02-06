@@ -203,11 +203,11 @@ export function SignupForm({
 
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our{" "}
-        <a href="#" className="underline">
+        <a href="/terms" className="underline">
           Terms of Service
         </a>{" "}
         and{" "}
-        <a href="#" className="underline">
+        <a href="/privacy" className="underline">
           Privacy Policy
         </a>
         .

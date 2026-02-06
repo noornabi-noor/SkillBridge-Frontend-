@@ -1,3 +1,4 @@
+import Footer from "@/components/shared/Footer";
 import { Navbar1 } from "@/components/shared/navbar1";
 import { ThemeProvider } from "@/provider/theme-provider";
 
@@ -12,6 +13,7 @@ const commonLayout = ({ children }: { children: React.ReactNode }) => {
       >
         <Navbar1 />
         {children}
+        <Footer/>
       </ThemeProvider>
     </div>
   );

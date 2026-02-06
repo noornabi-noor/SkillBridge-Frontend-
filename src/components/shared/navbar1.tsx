@@ -24,8 +24,9 @@ const isAuthenticated = false;
 const menu = [
   { title: "Find Tutors", url: "/find-tutors" },
   { title: "Categories", url: "/categories" },
-  { title: "Become a Tutor", url: "/become-tutor" },
-  { title: "AllUsers", url: "/allUsers" },
+  { title: "About", url: "/about" },
+  { title: "Terms", url: "/terms" },
+  { title: "Privacy", url: "/privacy" },
 ];
 
 function Navbar1() {
