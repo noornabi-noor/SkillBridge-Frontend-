@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { updateBookingStatusAdmin } from "@/services/dashboard/admin";
+import { useEffect, useMemo, useState } from "react";
+import { updateBookingStatusAdmin, getAllBookingsAdmin } from "@/services/dashboard/admin";
 import { toast } from "sonner";
 
 type Booking = {
@@ -22,31 +22,42 @@ type Booking = {
   };
 };
 
-export default function AdminBookingsTable({
-  initialBookings,
-}: {
-  initialBookings: Booking[];
-}) {
-  const [bookings, setBookings] = useState(initialBookings);
+export default function AdminBookingsTable() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"ALL" | Booking["status"]>("ALL");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // ✅ FETCH ON MOUNT
+  useEffect(() => {
+    async function fetchBookings() {
+      try {
+        setLoading(true);
+        const data = await getAllBookingsAdmin();
+        setBookings(data);
+      } catch (error: any) {
+        toast.error(error.message || "Failed to load bookings");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBookings();
+  }, []);
 
   const filteredBookings = useMemo(() => {
     if (filter === "ALL") return bookings;
     return bookings.filter((b) => b.status === filter);
   }, [bookings, filter]);
 
-  // STATUS UPDATE WITH TOAST
   const handleStatusChange = async (
     bookingId: string,
     status: Booking["status"]
   ) => {
     try {
       setUpdatingId(bookingId);
-
       const updated = await updateBookingStatusAdmin(bookingId, status);
 
-      // keep relations, update only status
       setBookings((prev) =>
         prev.map((b) =>
           b.id === bookingId ? { ...b, status: updated.status } : b
@@ -60,6 +71,14 @@ export default function AdminBookingsTable({
       setUpdatingId(null);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Loading bookings...
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow">
@@ -97,7 +116,6 @@ export default function AdminBookingsTable({
           <tbody>
             {filteredBookings.map((b) => (
               <tr key={b.id} className="border-b dark:border-gray-800">
-                {/* STUDENT */}
                 <td className="p-3">
                   <p className="font-medium dark:text-white">
                     {b.student?.name ?? "N/A"}
@@ -107,7 +125,6 @@ export default function AdminBookingsTable({
                   </p>
                 </td>
 
-                {/* TUTOR */}
                 <td className="p-3">
                   <p className="font-medium dark:text-white">
                     {b.tutor?.user?.name ?? "N/A"}
