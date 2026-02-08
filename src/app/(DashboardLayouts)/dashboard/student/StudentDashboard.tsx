@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/services/auth/auth";
 import { logout } from "@/services/auth/authClient";
@@ -11,6 +11,15 @@ import StudentOverview from "@/components/studentDashboard/StudentOverview";
 import StudentProfile from "@/components/studentDashboard/StudentProfile";
 import StudentReviews from "@/components/studentDashboard/StudentReviews";
 import Navbar from "@/components/tutorDashboard/Navbar";
+
+import {
+  HomeIcon,
+  UserCircleIcon,
+  CalendarDaysIcon,
+  ClipboardDocumentListIcon,
+  ChatBubbleLeftRightIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/outline";
 
 type ActiveTab =
   | "overview"
@@ -24,6 +33,7 @@ export default function StudentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch logged-in user
   useEffect(() => {
@@ -66,46 +76,67 @@ export default function StudentDashboard() {
     label: string;
     key: ActiveTab | "home";
     href?: string;
+    icon: React.ReactNode;
   }[] = [
-    { label: "Home", key: "home", href: "/" },
-    { label: "Overview", key: "overview" },
-    { label: "Browse Tutors", key: "browseTutors" },
-    { label: "My Bookings", key: "myBookings" },
-    { label: "My Review", key: "review" },
-    { label: "My Profile", key: "profile" },
+    { label: "Home", key: "home", href: "/", icon: <HomeIcon className="h-5 w-5" /> },
+    { label: "Overview", key: "overview", icon: <ChartBarIcon className="h-5 w-5" /> },
+    { label: "Browse Tutors", key: "browseTutors", icon: <UserCircleIcon className="h-5 w-5" /> },
+    { label: "My Bookings", key: "myBookings", icon: <ClipboardDocumentListIcon className="h-5 w-5" /> },
+    { label: "My Review", key: "review", icon: <ChatBubbleLeftRightIcon className="h-5 w-5" /> },
+    { label: "My Profile", key: "profile", icon: <UserCircleIcon className="h-5 w-5" /> },
   ];
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-800 shadow p-4">
-        <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
-          Student Dashboard
-        </h2>
+      <aside className="bg-white dark:bg-gray-800 shadow p-4 md:p-6 rounded-r-lg">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 hidden md:block">
+            Student Dashboard
+          </h2>
+          <button
+            className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-700"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? "✖" : "☰"}
+          </button>
+        </div>
 
-        <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li
-              key={item.key}
-              onClick={() => {
-                if (item.href) {
-                  router.push(item.href);
-                } else {
-                  setActiveTab(item.key as ActiveTab);
-                }
-              }}
-              className={`p-2 rounded cursor-pointer transition-colors
-                ${
-                  activeTab === item.key
-                    ? "bg-gray-200 dark:bg-gray-700 font-semibold"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                }
-                text-gray-800 dark:text-gray-100
-              `}
-            >
-              {item.label}
-            </li>
-          ))}
+        {/* Menu */}
+        <ul
+          className={`grid grid-cols-1 gap-2 ${
+            sidebarOpen ? "block" : "hidden"
+          } md:block`}
+        >
+          {menuItems.map((item) => {
+            const isActive = activeTab === item.key;
+
+            return (
+              <li
+                key={item.key}
+                title={item.label}
+                onClick={() => {
+                  if (item.href) {
+                    router.push(item.href);
+                  } else {
+                    setActiveTab(item.key as ActiveTab);
+                  }
+                  setSidebarOpen(false);
+                }}
+                className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors duration-200
+                  ${
+                    isActive
+                      ? "bg-blue-500 text-white dark:bg-blue-600"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  }
+                `}
+              >
+                {item.icon}
+                <span className="hidden md:block text-sm">{item.label}</span>
+              </li>
+            );
+          })}
         </ul>
       </aside>
 
@@ -114,19 +145,11 @@ export default function StudentDashboard() {
         <Navbar user={user} onLogout={handleLogout} />
 
         <div className="mt-6">
-          {activeTab === "overview" && (
-            <StudentOverview studentId={user.id} />
-          )}
+          {activeTab === "overview" && <StudentOverview studentId={user.id} />}
           {activeTab === "browseTutors" && <BrowseTutors />}
-          {activeTab === "myBookings" && (
-            <StudentBookings studentId={user.id} />
-          )}
-          {activeTab === "review" && (
-            <StudentReviews studentId={user.id} />
-          )}
-          {activeTab === "profile" && (
-            <StudentProfile studentId={user.id} />
-          )}
+          {activeTab === "myBookings" && <StudentBookings studentId={user.id} />}
+          {activeTab === "review" && <StudentReviews studentId={user.id} />}
+          {activeTab === "profile" && <StudentProfile studentId={user.id} />}
         </div>
       </div>
     </div>

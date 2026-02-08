@@ -24,41 +24,74 @@ export default function AdminOverview() {
     fetchStats();
   }, []);
 
-  if (!stats) return <div>Loading stats...</div>;
+  if (!stats) {
+    return (
+      <div className="flex justify-center py-10 text-gray-500 dark:text-gray-400">
+        Loading stats...
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Cards */}
+    <div className="space-y-8">
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="p-4 bg-white dark:bg-gray-900 rounded shadow">
-          <p className="text-sm text-gray-500">Total Users</p>
-          <p className="text-xl font-bold">{stats.totalUsers}</p>
-        </div>
-        <div className="p-4 bg-white dark:bg-gray-900 rounded shadow">
-          <p className="text-sm text-gray-500">Total Students</p>
-          <p className="text-xl font-bold">{stats.totalStudents}</p>
-        </div>
-        <div className="p-4 bg-white dark:bg-gray-900 rounded shadow">
-          <p className="text-sm text-gray-500">Total Tutors</p>
-          <p className="text-xl font-bold">{stats.totalTutors}</p>
-        </div>
-        <div className="p-4 bg-white dark:bg-gray-900 rounded shadow">
-          <p className="text-sm text-gray-500">Total Bookings</p>
-          <p className="text-xl font-bold">{stats.totalBookings}</p>
-        </div>
+        {[
+          { label: "Total Users", value: stats.totalUsers },
+          { label: "Total Students", value: stats.totalStudents },
+          { label: "Total Tutors", value: stats.totalTutors },
+          { label: "Total Bookings", value: stats.totalBookings },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="
+              bg-white dark:bg-gray-900
+              border border-gray-200 dark:border-gray-800
+              rounded-xl p-6
+              shadow-sm hover:shadow-md transition-shadow
+              min-h-[110px]
+              flex flex-col justify-center space-y-2
+            "
+          >
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {item.label}
+            </p>
+
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+              {item.value}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* New Users */}
-      <div className="mt-6 bg-white dark:bg-gray-900 p-4 rounded shadow">
-        <h3 className="text-lg font-semibold mb-2">New Users (Last 3 Days)</h3>
+      <div
+        className="
+          bg-white dark:bg-gray-900
+          border border-gray-200 dark:border-gray-800
+          rounded-xl p-6
+          shadow-sm
+        "
+      >
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
+          New Users (Last 3 Days)
+        </h3>
+
         {stats.newUsers.length === 0 ? (
-          <p>No new users in the last 3 days.</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No new users in the last 3 days.
+          </p>
         ) : (
-          <ul className="space-y-1">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-800">
             {stats.newUsers.map((user) => (
-              <li key={user.id} className="flex justify-between border-b py-1">
-                <span>{user.name}</span>
-                <span className="text-gray-500 text-sm">
+              <li
+                key={user.id}
+                className="flex items-center justify-between py-3 text-sm"
+              >
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  {user.name}
+                </span>
+                <span className="text-gray-500 dark:text-gray-400">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </span>
               </li>

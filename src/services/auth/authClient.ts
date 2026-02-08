@@ -45,7 +45,11 @@ export async function register(data: {
     throw new Error(err.message || "Registration failed");
   }
 
-  return res.json();
+  const text = await res.text();
+  if (!text) {
+    return { success: true };
+  }
+  return JSON.parse(text);
 }
 
 export async function loginWithGoogle() {

@@ -78,7 +78,7 @@ export default function TutorDashboard() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex-1 p-6 overflow-auto">
@@ -89,7 +89,8 @@ export default function TutorDashboard() {
           <TutorProfile stats={stats} setStats={setStats} />
         )}
         {activeTab === "availability" && (
-          <TutorAvailability tutorId={stats.profile.id} />
+          // <TutorAvailability tutorId={stats.profile.id} />
+          <TutorAvailability />
         )}
         {activeTab === "bookings" && <Bookings stats={stats} />}
         {activeTab === "reviews" && <Reviews stats={stats} />}

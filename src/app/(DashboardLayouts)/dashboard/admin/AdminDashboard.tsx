@@ -113,7 +113,7 @@ export default function AdminDashboard() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex-1 p-6 overflow-auto">
@@ -133,7 +133,8 @@ export default function AdminDashboard() {
 
         {activeTab === "bookings" && (
           <div className="mt-6">
-            <AdminBookingsTable initialBookings={bookings} />
+            {/* <AdminBookingsTable initialBookings={bookings} /> */}
+             <AdminBookingsTable />
           </div>
         )}
 
