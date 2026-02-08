@@ -3,11 +3,22 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
+import { getCurrentUser } from "@/services/auth/auth";
 
 interface User {
   name: string;
   image?: string | null;
 }
+
+// interface Tutor {
+//   id: string;
+//   bio?: string;
+//   pricePerHour?: number;
+//   experience?: string;
+//   rating?: number;
+//   user?: User | null;
+// }
 
 interface Tutor {
   id: string;
@@ -15,7 +26,8 @@ interface Tutor {
   pricePerHour?: number;
   experience?: string;
   rating?: number;
-  user?: User | null;
+  subjects?: string[];
+  user: { name: string; email: string; image?: string | null };
 }
 
 interface Category {
@@ -29,6 +41,20 @@ interface Category {
 export default function CategoryWiseTutors() {
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
+
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     fetchCategories();
@@ -104,12 +130,18 @@ export default function CategoryWiseTutors() {
                       ⭐ {t.tutor.rating.toFixed(1)}
                     </p>
                   )}
-                  <button
-                    onClick={() => router.push(`/categories/${t.tutor.id}`)}
-                    className="mt-4 px-5 py-2 rounded-full bg-blue-500 text-white font-semibold hover:bg-blue-600 dark:bg-purple-600 dark:hover:bg-purple-700 transition"
-                  >
-                    See Details
-                  </button>
+
+                  <div className="mt-4 flex justify-between">
+                    {/* Book button */}
+                    <BookTutorButton tutor={t.tutor} user={user} />
+
+                    <button
+                      onClick={() => router.push(`/categories/${t.tutor.id}`)}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                    >
+                      See Details
+                    </button>
+                  </div>
                 </motion.div>
               ))}
             </div>
