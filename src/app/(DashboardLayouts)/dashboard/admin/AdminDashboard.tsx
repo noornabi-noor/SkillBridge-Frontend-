@@ -113,48 +113,31 @@ export default function AdminDashboard() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      {/* Sidebar */}
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="flex-1 p-6 overflow-auto">
-        <Navbar user={user} onLogout={handleLogout} />
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Navbar */}
+        <div className="px-6 pt-4">
+          <Navbar user={user} onLogout={handleLogout} />
+        </div>
 
-        {activeTab === "overview" && (
-          <div className="mt-6">
-            <AdminOverview />
-          </div>
-        )}
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          {activeTab === "overview" && <AdminOverview />}
 
-        {activeTab === "users" && (
-          <div className="mt-6">
-            <AdminUsersTable initialUsers={users} />
-          </div>
-        )}
+          {activeTab === "users" && <AdminUsersTable initialUsers={users} />}
 
-        {activeTab === "bookings" && (
-          <div className="mt-6">
-            {/* <AdminBookingsTable initialBookings={bookings} /> */}
-             <AdminBookingsTable />
-          </div>
-        )}
+          {activeTab === "bookings" && <AdminBookingsTable />}
 
-        {activeTab === "categories" && (
-          <div className="mt-6">
-            <AdminCategoriesTable />
-          </div>
-        )}
+          {activeTab === "categories" && <AdminCategoriesTable />}
 
-        {activeTab === "reviews" && (
-          <div className="mt-6">
-            <AdminReviewsTable />
-          </div>
-        )}
+          {activeTab === "reviews" && <AdminReviewsTable />}
 
-        {activeTab === "profile" && (
-          <div className="mt-6">
-            <AdminProfile />
-          </div>
-        )}
+          {activeTab === "profile" && <AdminProfile />}
+        </div>
       </div>
     </div>
   );
