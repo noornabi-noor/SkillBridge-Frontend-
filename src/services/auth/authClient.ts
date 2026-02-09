@@ -1,7 +1,7 @@
 // services/auth/authClient.ts
 import { authClient } from "./auth-client";
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function login(data: { email: string; password: string }) {
   const res = await fetch(`${API_URL}/api/auth/sign-in/email`, {
@@ -9,7 +9,7 @@ export async function login(data: { email: string; password: string }) {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      Origin: APP_URL,
     },
     body: JSON.stringify(data),
   });
@@ -35,7 +35,7 @@ export async function register(data: {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      Origin: APP_URL,
     },
     body: JSON.stringify(data),
   });
@@ -55,7 +55,8 @@ export async function register(data: {
 export async function loginWithGoogle() {
   await authClient.signIn.social({
     provider: "google",
-    callbackURL: "http://localhost:3000/dashboard", 
+    // callbackURL: "http://localhost:3000/dashboard", 
+    callbackURL: `${APP_URL}/dashboard`, 
   });
 }
 

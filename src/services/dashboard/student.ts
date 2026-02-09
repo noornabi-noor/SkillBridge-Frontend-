@@ -1,8 +1,8 @@
 // services/dashboard/student.ts
 "use server";
 import { cookies } from "next/headers";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function getAllTutors() {
   const res = await fetch(`${API_URL}/api/tutors`, {
@@ -28,7 +28,7 @@ export async function getStudentBookings() {
   const res = await fetch(`${API_URL}/api/bookings`, {
     headers: {
       Cookie: cookieHeader,
-      Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      Origin: APP_URL,
     },
     cache: "no-store",
   });

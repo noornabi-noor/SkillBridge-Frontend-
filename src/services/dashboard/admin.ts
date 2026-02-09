@@ -2,7 +2,8 @@
 
 import { cookies } from "next/headers";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function getAllUsersAdmin() {
   const cookieStore = await cookies();
