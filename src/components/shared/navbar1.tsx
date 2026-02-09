@@ -25,6 +25,7 @@ import { logout } from "@/services/auth/authClient";
 const menu = [
   { title: "Find Tutors", url: "/find-tutors" },
   { title: "Categories", url: "/categories" },
+  { title: "Become a Tutor", url: "/become-tutor" },
   { title: "About", url: "/about" },
   { title: "Terms", url: "/terms" },
   { title: "Privacy", url: "/privacy" },

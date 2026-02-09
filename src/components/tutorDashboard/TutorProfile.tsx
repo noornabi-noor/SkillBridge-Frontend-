@@ -77,7 +77,7 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
       }
 
       const updatedStats = await getTutorDashboardStats(stats.user.id);
-      setStats(updatedStats); 
+      setStats(updatedStats);
       setIsEditing(false);
       alert("Profile updated successfully ✅");
     } catch (err: any) {
@@ -231,3 +231,292 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
     </div>
   );
 }
+
+
+
+
+
+// "use client";
+// import { useState } from "react";
+// import {
+//   getTutorDashboardStats,
+//   TutorProfile as TutorProfileType,
+// } from "@/services/dashboard/tutor";
+
+// interface Props {
+//   stats: any;
+//   setStats: (stats: any) => void;
+// }
+
+// const Toast = ({
+//   message,
+//   type,
+// }: {
+//   message: string;
+//   type: "success" | "error";
+// }) => (
+//   <div
+//     className={`fixed top-4 right-4 px-4 py-2 rounded shadow text-white ${
+//       type === "success" ? "bg-green-500" : "bg-red-500"
+//     }`}
+//   >
+//     {message}
+//   </div>
+// );
+
+// export default function TutorProfile({ stats, setStats }: Props) {
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [toast, setToast] = useState<{
+//     message: string;
+//     type: "success" | "error";
+//   } | null>(null);
+
+//   const [formData, setFormData] = useState({
+//     name: stats.user?.name || "",
+//     email: stats.user?.email || "",
+//     phone: stats.user?.phone || "",
+//     image: stats.user?.image || "",
+//     bio: stats.profile?.bio || "",
+//     experience: stats.profile?.experience?.toString() || "",
+//     rate: stats.profile?.pricePerHour || 0,
+//     categories: stats.profile?.categories?.join(",") || "",
+//   });
+
+//   const showToast = (
+//     message: string,
+//     type: "success" | "error" = "success",
+//   ) => {
+//     setToast({ message, type });
+//     setTimeout(() => setToast(null), 3000);
+//   };
+
+//   // const handleSave = async () => {
+//   //   try {
+//   //     // Update main user
+//   //     const userRes = await fetch(
+//   //       `${process.env.NEXT_PUBLIC_API_URL}/api/users/${stats.user.id}`,
+//   //       {
+//   //         method: "PATCH",
+//   //         headers: { "Content-Type": "application/json" },
+//   //         credentials: "include",
+//   //         body: JSON.stringify({
+//   //           name: formData.name,
+//   //           email: formData.email,
+//   //           phone: formData.phone,
+//   //           image: formData.image,
+//   //         }),
+//   //       },
+//   //     );
+//   //     if (!userRes.ok)
+//   //       throw new Error(`Failed to update main profile: ${userRes.status}`);
+
+//   //     if (
+//   //       formData.bio ||
+//   //       formData.experience ||
+//   //       formData.rate ||
+//   //       formData.categories
+//   //     ) {
+//   //       const method = stats?.profile ? "PATCH" : "POST";
+//   //       const tutorRes = await fetch(
+//   //         `${process.env.NEXT_PUBLIC_API_URL}/api/tutors`,
+//   //         {
+//   //           method,
+//   //           headers: { "Content-Type": "application/json" },
+//   //           credentials: "include",
+//   //           body: JSON.stringify({
+//   //             bio: formData.bio,
+//   //             experience: Number(formData.experience),
+//   //             pricePerHour: Number(formData.rate),
+//   //             categories: formData.categories
+//   //               .split(",")
+//   //               .map((c: string) => c.trim()) // <-- fixed here
+//   //               .filter(Boolean),
+//   //           }),
+//   //         },
+//   //       );
+
+//   //       if (!tutorRes.ok)
+//   //         throw new Error(`Failed to update tutor profile: ${tutorRes.status}`);
+//   //     }
+
+//   //     const updatedStats = await getTutorDashboardStats(stats.user.id);
+//   //     setStats(updatedStats);
+//   //     setIsEditing(false);
+//   //     showToast("Profile updated ✅", "success");
+//   //   } catch (err: any) {
+//   //     console.error(err);
+//   //     showToast(err.message || "Failed to save profile ❌", "error");
+//   //   }
+//   // };
+
+//   const handleSave = async () => {
+//   if (!stats.user || !stats.user.id) {
+//     alert("User not loaded. Please refresh the page.");
+//     return;
+//   }
+
+//   try {
+//     // Update main user
+//     const userRes = await fetch(
+//       `${process.env.NEXT_PUBLIC_API_URL}/api/users/${stats.user.id}`,
+//       {
+//         method: "PATCH",
+//         headers: { "Content-Type": "application/json" },
+//         credentials: "include",
+//         body: JSON.stringify({
+//           name: formData.name,
+//           email: formData.email,
+//           phone: formData.phone,
+//           image: formData.image,
+//         }),
+//       }
+//     );
+
+//     if (!userRes.ok) throw new Error("Failed to update main profile");
+
+//     // Update or create tutor profile
+//     if (formData.bio || formData.experience || formData.rate || formData.categories) {
+//       const method = stats?.profile ? "PATCH" : "POST";
+//       const tutorRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tutors`, {
+//         method,
+//         headers: { "Content-Type": "application/json" },
+//         credentials: "include",
+//         body: JSON.stringify({
+//           bio: formData.bio,
+//           experience: Number(formData.experience),
+//           pricePerHour: Number(formData.rate),
+//           categories: formData.categories
+//             .split(",")
+//             .map((c: string) => c.trim())
+//             .filter(Boolean),
+//         }),
+//       });
+
+//       if (!tutorRes.ok) throw new Error(`Failed to update tutor profile: ${tutorRes.status}`);
+//     }
+
+//     const updatedStats = await getTutorDashboardStats(stats.user.id);
+//     setStats(updatedStats);
+//     setIsEditing(false);
+//     alert("Profile updated successfully ✅");
+//   } catch (err: any) {
+//     console.error(err);
+//     alert("Failed to save profile ❌: " + err.message);
+//   }
+// };
+
+
+//   return (
+//     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6 transition-colors duration-300">
+//       {toast && <Toast message={toast.message} type={toast.type} />}
+//       <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+//         My Profile
+//       </h2>
+
+//       {!isEditing ? (
+//         <div className="space-y-2 text-gray-800 dark:text-gray-200">
+//           <img
+//             src={
+//               stats.user?.image?.startsWith("http")
+//                 ? stats.user.image
+//                 : "/avatar.png"
+//             }
+//             alt={stats.user?.name || "User"}
+//             className="w-20 h-20 rounded-full object-cover border"
+//           />
+//           <p>
+//             <strong>Name:</strong> {stats.user?.name}
+//           </p>
+//           <p>
+//             <strong>Email:</strong> {stats.user?.email}
+//           </p>
+//           <p>
+//             <strong>Phone:</strong> {stats.user?.phone || "Not set"}
+//           </p>
+
+//           {stats.profile && (
+//             <>
+//               <p>
+//                 <strong>Bio:</strong> {stats.profile.bio}
+//               </p>
+//               <p>
+//                 <strong>Experience:</strong> {stats.profile.experience} years
+//               </p>
+//               <p>
+//                 <strong>Rate:</strong> ${stats.profile.pricePerHour}/hr
+//               </p>
+//               <p>
+//                 <strong>Categories:</strong>{" "}
+//                 {stats.profile.categories?.join(", ")}
+//               </p>
+//             </>
+//           )}
+
+//           <button
+//             onClick={() => setIsEditing(true)}
+//             className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 mt-4"
+//           >
+//             Edit Profile
+//           </button>
+//         </div>
+//       ) : (
+//         <div className="space-y-3">
+//           {["name", "email", "phone", "image", "bio"].map((field) => (
+//             <input
+//               key={field}
+//               className="border dark:border-gray-600 px-2 py-1 w-full rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+//               placeholder={field[0].toUpperCase() + field.slice(1)}
+//               value={(formData as any)[field]}
+//               onChange={(e) =>
+//                 setFormData({ ...formData, [field]: e.target.value })
+//               }
+//             />
+//           ))}
+
+//           <input
+//             className="border dark:border-gray-600 px-2 py-1 w-full rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+//             placeholder="Experience (years)"
+//             type="number"
+//             value={formData.experience}
+//             onChange={(e) =>
+//               setFormData({ ...formData, experience: e.target.value })
+//             }
+//           />
+//           <input
+//             className="border dark:border-gray-600 px-2 py-1 w-full rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+//             placeholder="Rate ($/hr)"
+//             type="number"
+//             step="0.01"
+//             value={formData.rate}
+//             onChange={(e) =>
+//               setFormData({ ...formData, rate: Number(e.target.value) })
+//             }
+//           />
+//           <input
+//             className="border dark:border-gray-600 px-2 py-1 w-full rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+//             placeholder="Categories (comma separated)"
+//             value={formData.categories}
+//             onChange={(e) =>
+//               setFormData({ ...formData, categories: e.target.value })
+//             }
+//           />
+
+//           <div className="flex space-x-2">
+//             <button
+//               onClick={handleSave}
+//               className="bg-green-500 dark:bg-green-600 text-white px-4 py-2 rounded hover:bg-green-600 dark:hover:bg-green-700"
+//             >
+//               Save
+//             </button>
+//             <button
+//               onClick={() => setIsEditing(false)}
+//               className="bg-gray-400 dark:bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-500 dark:hover:bg-gray-700"
+//             >
+//               Cancel
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }

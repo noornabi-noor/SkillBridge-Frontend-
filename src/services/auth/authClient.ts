@@ -55,7 +55,7 @@ export async function register(data: {
 export async function loginWithGoogle() {
   await authClient.signIn.social({
     provider: "google",
-    callbackURL: "http://localhost:3000/", 
+    callbackURL: "http://localhost:3000/dashboard", 
   });
 }
 

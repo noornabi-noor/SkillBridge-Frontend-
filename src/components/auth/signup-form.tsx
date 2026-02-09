@@ -115,7 +115,7 @@ export function SignupForm({
                 <select
                   id="role"
                   name="role"
-                  className="w-full border rounded p-2"
+                  className="w-full border rounded p-2 dark:text"
                   required
                 >
                   <option value="">Select a role</option>
