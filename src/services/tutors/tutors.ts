@@ -1,3 +1,4 @@
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getAllTutors() {
@@ -31,20 +32,6 @@ export async function getAllUsers() {
 
   if (!res.ok) {
     throw new Error("Failed to fetch users");
-  }
-
-  const json = await res.json();
-
-  return json.data;
-}
-
-export async function getTopRatedTutor() {
-  const res = await fetch(`${API_URL}/api/tutors/top-tutor`, {
-    cache: "no-store",
-  });
-
-  if(!res.ok){
-    throw new Error("Failed to fetch tutors");
   }
 
   const json = await res.json();

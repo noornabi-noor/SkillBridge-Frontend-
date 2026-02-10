@@ -1,4 +1,4 @@
-"use client";
+// "use server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -64,4 +64,18 @@ export async function deleteAvailability(id: string) {
   }
 
   return (await res.json()).data;
+}
+
+
+export async function getTutorAvailability(tutorId: string) {
+  const res = await fetch(`${API_URL}/api/availability/tutor/${tutorId}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch availability");
+  }
+
+  const json = await res.json(); 
+  return json.data || [];
 }

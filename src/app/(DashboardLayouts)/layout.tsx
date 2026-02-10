@@ -1,5 +1,4 @@
 // app/(DashboardLayouts)/dashboard/layout.tsx
-
 import ToastProvider from "@/components/providers/ToastProvider";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { getCurrentUser } from "@/services/auth/auth";

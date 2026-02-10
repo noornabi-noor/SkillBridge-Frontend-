@@ -5,20 +5,12 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
 import { getCurrentUser } from "@/services/auth/auth";
+import { getCategories } from "@/services/dashboard/tutor";
 
 interface User {
   name: string;
   image?: string | null;
 }
-
-// interface Tutor {
-//   id: string;
-//   bio?: string;
-//   pricePerHour?: number;
-//   experience?: string;
-//   rating?: number;
-//   user?: User | null;
-// }
 
 interface Tutor {
   id: string;
@@ -57,24 +49,12 @@ export default function CategoryWiseTutors() {
   }, []);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
-      );
-      const data = await res.json();
-
-      // Only include categories with at least one tutor
-      setCategories(
-        data.data.filter((c: Category) => c.tutors && c.tutors.length > 0),
-      );
-    } catch (err) {
-      console.error(err);
+    async function fetchData() {
+      const data = await getCategories();
+      setCategories(data);
     }
-  };
+    fetchData();
+  }, []);
 
   const handleSeeDetails = (tutorId: string) => {
     router.push(`/tutors/${tutorId}`);

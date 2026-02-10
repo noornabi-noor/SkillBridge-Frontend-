@@ -1,5 +1,8 @@
 "use client";
 
+import { createBooking, getMyBookings } from "@/services/dashboard/booking";
+import { getAllTutors } from "@/services/dashboard/student";
+import { getTutorAvailability } from "@/services/dashboard/tutorAvailability";
 import { useEffect, useState } from "react";
 
 interface Tutor {
@@ -90,18 +93,23 @@ export default function BrowseTutors() {
   }, []);
 
   const fetchTutors = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tutors`);
-    const data = await res.json();
-    setTutors(data.data || []);
+    try {
+      const data = await getAllTutors();
+      setTutors(data);
+    } catch (err) {
+      console.error(err);
+      setTutors([]);
+    }
   };
 
   const fetchMyBookings = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`,
-      { credentials: "include" },
-    );
-    const data = await res.json();
-    setBookings(data.data || []);
+    try {
+      const data = await getMyBookings();
+      setBookings(data);
+    } catch (err) {
+      console.error(err);
+      setBookings([]);
+    }
   };
 
   const openTutor = async (tutor: Tutor) => {
@@ -112,11 +120,13 @@ export default function BrowseTutors() {
     setSelectedStartTime("");
     setSelectedEndTime("");
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/availability/tutor/${tutor.id}`,
-    );
-    const data = await res.json();
-    setAvailability(data.data || []);
+    try {
+      const data = await getTutorAvailability(tutor.id);
+      setAvailability(data);
+    } catch (err) {
+      console.error(err);
+      setAvailability([]);
+    }
   };
 
   const calculateFreeSlots = (date: string) => {
@@ -199,23 +209,15 @@ export default function BrowseTutors() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tutorId: selectedTutor.id,
-            date: selectedDate,
-            startTime: selectedStartTime,
-            endTime: selectedEndTime,
-          }),
-        },
-      );
+      const data = await createBooking({
+        tutorId: selectedTutor.id,
+        date: selectedDate,
+        startTime: selectedStartTime,
+        endTime: selectedEndTime,
+      });
 
-      if (!res.ok) {
-        const data = await res.json();
+      // if your API returns { success: true/false, message: string }
+      if (!data.success) {
         throw new Error(data.message || "Booking failed");
       }
 

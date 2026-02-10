@@ -1,5 +1,7 @@
 "use client";
 
+import { createBooking, getMyBookings } from "@/services/dashboard/booking";
+import { getTutorAvailability } from "@/services/dashboard/tutorAvailability";
 import { useEffect, useState } from "react";
 
 interface Tutor {
@@ -54,12 +56,20 @@ const minutesToTime24h = (min: number) => {
   return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 };
 
-export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: User | null | undefined }) {
+export default function BookTutorButton({
+  tutor,
+  user,
+}: {
+  tutor: Tutor;
+  user: User | null | undefined;
+}) {
   const [showModal, setShowModal] = useState(false);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [freeSlots, setFreeSlots] = useState<{ startTime: number; endTime: number }[]>([]);
+  const [freeSlots, setFreeSlots] = useState<
+    { startTime: number; endTime: number }[]
+  >([]);
   const [selectedStartTime, setSelectedStartTime] = useState("");
   const [selectedEndTime, setSelectedEndTime] = useState("");
 
@@ -70,16 +80,36 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
     }
   }, [showModal]);
 
+  // const fetchAvailability = async () => {
+  //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/availability/tutor/${tutor.id}`);
+  //   const data = await res.json();
+  //   setAvailability(data.data || []);
+  // };
+
+  // const fetchBookings = async () => {
+  //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`, { credentials: "include" });
+  //   const data = await res.json();
+  //   setBookings(data.data || []);
+  // };
+
   const fetchAvailability = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/availability/tutor/${tutor.id}`);
-    const data = await res.json();
-    setAvailability(data.data || []);
+    try {
+      const data = await getTutorAvailability(tutor.id);
+      setAvailability(data);
+    } catch (err) {
+      console.error(err);
+      setAvailability([]);
+    }
   };
 
   const fetchBookings = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`, { credentials: "include" });
-    const data = await res.json();
-    setBookings(data.data || []);
+    try {
+      const data = await getMyBookings();
+      setBookings(data);
+    } catch (err) {
+      console.error(err);
+      setBookings([]);
+    }
   };
 
   const calculateFreeSlots = (date: string) => {
@@ -95,15 +125,26 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
       let tmp = [{ startTime: start, endTime: end }];
 
       const dayBookings = bookings
-        .filter((b) => b.tutorId === tutor.id && b.date === date && ["PENDING", "CONFIRMED"].includes(b.status))
-        .map((b) => ({ startTime: toMinutes(b.startTime), endTime: toMinutes(b.endTime) }));
+        .filter(
+          (b) =>
+            b.tutorId === tutor.id &&
+            b.date === date &&
+            ["PENDING", "CONFIRMED"].includes(b.status),
+        )
+        .map((b) => ({
+          startTime: toMinutes(b.startTime),
+          endTime: toMinutes(b.endTime),
+        }));
 
       dayBookings.forEach((b) => {
         tmp = tmp.flatMap((slot) => {
-          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime) return [slot];
+          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime)
+            return [slot];
           const res: { startTime: number; endTime: number }[] = [];
-          if (b.startTime > slot.startTime) res.push({ startTime: slot.startTime, endTime: b.startTime });
-          if (b.endTime < slot.endTime) res.push({ startTime: b.endTime, endTime: slot.endTime });
+          if (b.startTime > slot.startTime)
+            res.push({ startTime: slot.startTime, endTime: b.startTime });
+          if (b.endTime < slot.endTime)
+            res.push({ startTime: b.endTime, endTime: slot.endTime });
           return res;
         });
       });
@@ -123,24 +164,44 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
   };
 
   const bookTutor = async () => {
-    if (!selectedDate || !selectedStartTime || !selectedEndTime) return alert("Select date and time");
+    if (!selectedDate || !selectedStartTime || !selectedEndTime)
+      return alert("Select date and time");
 
     const startMin = toMinutes(selectedStartTime);
     const endMin = toMinutes(selectedEndTime);
 
     if (availability.length > 0) {
-      const valid = freeSlots.some((s) => startMin >= s.startTime && endMin <= s.endTime && startMin < endMin);
-      if (!valid) return alert("Selected time is invalid or overlaps existing bookings");
+      const valid = freeSlots.some(
+        (s) =>
+          startMin >= s.startTime && endMin <= s.endTime && startMin < endMin,
+      );
+      if (!valid)
+        return alert("Selected time is invalid or overlaps existing bookings");
     } else if (startMin >= endMin) {
       return alert("End time must be after start time");
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tutorId: tutor.id, date: selectedDate, startTime: selectedStartTime, endTime: selectedEndTime }),
+      // const res = await fetch(
+      //   `${process.env.NEXT_PUBLIC_API_URL}/api/bookings`,
+      //   {
+      //     method: "POST",
+      //     credentials: "include",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({
+      //       tutorId: tutor.id,
+      //       date: selectedDate,
+      //       startTime: selectedStartTime,
+      //       endTime: selectedEndTime,
+      //     }),
+      //   },
+      // );
+
+      const res = await await createBooking({
+        tutorId: tutor.id,
+        date: selectedDate,
+        startTime: selectedStartTime,
+        endTime: selectedEndTime,
       });
 
       if (!res.ok) {
@@ -185,20 +246,33 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-start pt-20 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 w-full max-w-md rounded-xl shadow-lg">
-            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">{tutor.user.name}</h2>
+            <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              {tutor.user.name}
+            </h2>
 
-            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Availability</h3>
+            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
+              Availability
+            </h3>
             {availability.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No availability set. You can book any time.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                No availability set. You can book any time.
+              </p>
             ) : (
               availability.map((a) => (
-                <div key={a.id} className="border rounded p-2 mb-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                  <strong>{days[a.dayOfWeek]}</strong> {minutesToTime12h(toMinutes(a.startTime))} – {minutesToTime12h(toMinutes(a.endTime))}
+                <div
+                  key={a.id}
+                  className="border rounded p-2 mb-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                >
+                  <strong>{days[a.dayOfWeek]}</strong>{" "}
+                  {minutesToTime12h(toMinutes(a.startTime))} –{" "}
+                  {minutesToTime12h(toMinutes(a.endTime))}
                 </div>
               ))
             )}
 
-            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">Select Date:</label>
+            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">
+              Select Date:
+            </label>
             <input
               type="date"
               value={selectedDate}
@@ -208,11 +282,19 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
 
             {selectedDate && (
               <>
-                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Select Time</h3>
+                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
+                  Select Time
+                </h3>
                 {freeSlots.length > 0 ? (
                   freeSlots.map((slot) => (
-                    <div key={`${slot.startTime}-${slot.endTime}`} className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                      <div>Free Slot: {minutesToTime12h(slot.startTime)} – {minutesToTime12h(slot.endTime)}</div>
+                    <div
+                      key={`${slot.startTime}-${slot.endTime}`}
+                      className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    >
+                      <div>
+                        Free Slot: {minutesToTime12h(slot.startTime)} –{" "}
+                        {minutesToTime12h(slot.endTime)}
+                      </div>
                       <div className="flex gap-2">
                         <input
                           type="time"
@@ -224,7 +306,10 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
                         />
                         <input
                           type="time"
-                          min={selectedStartTime || minutesToTime24h(slot.startTime)}
+                          min={
+                            selectedStartTime ||
+                            minutesToTime24h(slot.startTime)
+                          }
                           max={minutesToTime24h(slot.endTime)}
                           value={selectedEndTime}
                           onChange={(e) => setSelectedEndTime(e.target.value)}
@@ -237,19 +322,35 @@ export default function BookTutorButton({ tutor, user }: { tutor: Tutor; user: U
                   <div className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <div>Pick any time</div>
                     <div className="flex gap-2">
-                      <input type="time" value={selectedStartTime} onChange={(e) => setSelectedStartTime(e.target.value)} className="border px-2 py-1 flex-1 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100" />
-                      <input type="time" value={selectedEndTime} onChange={(e) => setSelectedEndTime(e.target.value)} className="border px-2 py-1 flex-1 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100" />
+                      <input
+                        type="time"
+                        value={selectedStartTime}
+                        onChange={(e) => setSelectedStartTime(e.target.value)}
+                        className="border px-2 py-1 flex-1 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100"
+                      />
+                      <input
+                        type="time"
+                        value={selectedEndTime}
+                        onChange={(e) => setSelectedEndTime(e.target.value)}
+                        className="border px-2 py-1 flex-1 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100"
+                      />
                     </div>
                   </div>
                 )}
 
-                <button onClick={bookTutor} className="mt-2 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+                <button
+                  onClick={bookTutor}
+                  className="mt-2 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                >
                   Book Selected Time
                 </button>
               </>
             )}
 
-            <button onClick={() => setShowModal(false)} className="mt-4 w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-500">
+            <button
+              onClick={() => setShowModal(false)}
+              className="mt-4 w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
+            >
               Close
             </button>
           </div>

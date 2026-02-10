@@ -8,10 +8,16 @@ import {
   deleteAvailability,
 } from "@/services/dashboard/tutorAvailability";
 
-// Simple toast
-const Toast = ({ message, type }: { message: string; type: "success" | "error" }) => (
+// Toast component (below navbar)
+const Toast = ({
+  message,
+  type,
+}: {
+  message: string;
+  type: "success" | "error";
+}) => (
   <div
-    className={`fixed top-4 right-4 px-4 py-2 rounded shadow text-white ${
+    className={`fixed top-20 right-4 z-50 px-4 py-2 rounded shadow text-white ${
       type === "success" ? "bg-green-500" : "bg-red-500"
     }`}
   >
@@ -21,21 +27,26 @@ const Toast = ({ message, type }: { message: string; type: "success" | "error" }
 
 export default function TutorAvailability() {
   const [slots, setSlots] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  const [newSlot, setNewSlot] = useState({ dayOfWeek: "", startTime: "", endTime: "" });
+  const [newSlot, setNewSlot] = useState({
+    dayOfWeek: "",
+    startTime: "",
+    endTime: "",
+  });
+
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editSlot, setEditSlot] = useState({ dayOfWeek: 0, startTime: "", endTime: "" });
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(
-    null
-  );
+  const [editSlot, setEditSlot] = useState({
+    dayOfWeek: 0,
+    startTime: "",
+    endTime: "",
+  });
 
   useEffect(() => {
-    // small delay for auth/session
-    const timer = setTimeout(() => {
-      fetchSlots();
-    }, 300);
-    return () => clearTimeout(timer);
+    fetchSlots();
   }, []);
 
   const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -45,14 +56,11 @@ export default function TutorAvailability() {
 
   const fetchSlots = async () => {
     try {
-      setLoading(true);
       const data = await getMyAvailability();
       setSlots(data);
     } catch (err: any) {
       console.error(err);
       showToast("Failed to load availability", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -68,29 +76,25 @@ export default function TutorAvailability() {
         startTime: newSlot.startTime,
         endTime: newSlot.endTime,
       });
+
       setNewSlot({ dayOfWeek: "", startTime: "", endTime: "" });
       fetchSlots();
-      showToast("Availability added ✅", "success");
+      showToast("Availability added ✅");
     } catch (err: any) {
       console.error(err);
-      showToast(err.message || "Failed to create slot ❌", "error");
+      showToast(err.message || "Create failed ❌", "error");
     }
   };
 
   const handleUpdate = async (id: string) => {
-    if (!editSlot.dayOfWeek || !editSlot.startTime || !editSlot.endTime) {
-      showToast("Fill all fields to update", "error");
-      return;
-    }
-
     try {
       await updateAvailability(id, editSlot);
       setEditingId(null);
       fetchSlots();
-      showToast("Slot updated ✅", "success");
+      showToast("Slot updated ✅");
     } catch (err: any) {
       console.error(err);
-      showToast(err.message || "Failed to update slot ❌", "error");
+      showToast(err.message || "Update failed ❌", "error");
     }
   };
 
@@ -100,14 +104,12 @@ export default function TutorAvailability() {
     try {
       await deleteAvailability(id);
       fetchSlots();
-      showToast("Slot deleted ✅", "success");
+      showToast("Slot deleted ✅");
     } catch (err: any) {
       console.error(err);
-      showToast(err.message || "Failed to delete slot ❌", "error");
+      showToast(err.message || "Delete failed ❌", "error");
     }
   };
-
-  if (loading) return <p className="text-gray-500">Loading availability…</p>;
 
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow max-w-2xl mx-auto">
@@ -115,112 +117,113 @@ export default function TutorAvailability() {
 
       <h2 className="text-xl font-semibold mb-4">Your Availability</h2>
 
-      {/* CREATE FORM ROW */}
-      <div className="grid grid-cols-4 gap-2 mb-4 items-center">
+      {/* CREATE */}
+      <div className="grid grid-cols-4 gap-2 mb-4">
         <input
           type="number"
           placeholder="Day (0-6)"
           value={newSlot.dayOfWeek}
-          onChange={(e) => setNewSlot({ ...newSlot, dayOfWeek: e.target.value })}
-          className="border px-2 py-1 rounded w-full"
+          onChange={(e) =>
+            setNewSlot({ ...newSlot, dayOfWeek: e.target.value })
+          }
+          className="border px-2 py-1 rounded"
         />
         <input
           type="time"
           value={newSlot.startTime}
-          onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-          className="border px-2 py-1 rounded w-full"
+          onChange={(e) =>
+            setNewSlot({ ...newSlot, startTime: e.target.value })
+          }
+          className="border px-2 py-1 rounded"
         />
         <input
           type="time"
           value={newSlot.endTime}
-          onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-          className="border px-2 py-1 rounded w-full"
+          onChange={(e) =>
+            setNewSlot({ ...newSlot, endTime: e.target.value })
+          }
+          className="border px-2 py-1 rounded"
         />
         <button
           onClick={handleCreate}
-          className="bg-blue-600 text-white px-3 py-1 rounded w-full"
+          className="bg-blue-600 text-white rounded"
         >
           Add
         </button>
       </div>
 
-      {/* LIST OF AVAILABILITY */}
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        {slots.map((slot) => (
-          <div
-            key={slot.id}
-            className="flex flex-wrap justify-between items-center py-2"
-          >
-            {editingId === slot.id ? (
-              <div className="grid grid-cols-4 gap-2 w-full">
-                <input
-                  type="number"
-                  value={editSlot.dayOfWeek}
-                  onChange={(e) =>
-                    setEditSlot({ ...editSlot, dayOfWeek: Number(e.target.value) })
-                  }
-                  className="border px-2 py-1 rounded w-full"
-                />
-                <input
-                  type="time"
-                  value={editSlot.startTime}
-                  onChange={(e) =>
-                    setEditSlot({ ...editSlot, startTime: e.target.value })
-                  }
-                  className="border px-2 py-1 rounded w-full"
-                />
-                <input
-                  type="time"
-                  value={editSlot.endTime}
-                  onChange={(e) => setEditSlot({ ...editSlot, endTime: e.target.value })}
-                  className="border px-2 py-1 rounded w-full"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleUpdate(slot.id)}
-                    className="bg-green-600 text-white px-2 py-1 rounded"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="bg-gray-400 text-white px-2 py-1 rounded"
-                  >
-                    Cancel
-                  </button>
-                </div>
+      {/* LIST */}
+      {slots.length === 0 && (
+        <p className="text-gray-500">No availability added yet.</p>
+      )}
+
+      {slots.map((slot) => (
+        <div
+          key={slot.id}
+          className="flex justify-between items-center py-2 border-b"
+        >
+          {editingId === slot.id ? (
+            <>
+              <input
+                type="number"
+                value={editSlot.dayOfWeek}
+                onChange={(e) =>
+                  setEditSlot({
+                    ...editSlot,
+                    dayOfWeek: Number(e.target.value),
+                  })
+                }
+                className="border px-2 py-1 rounded"
+              />
+              <input
+                type="time"
+                value={editSlot.startTime}
+                onChange={(e) =>
+                  setEditSlot({ ...editSlot, startTime: e.target.value })
+                }
+                className="border px-2 py-1 rounded"
+              />
+              <input
+                type="time"
+                value={editSlot.endTime}
+                onChange={(e) =>
+                  setEditSlot({ ...editSlot, endTime: e.target.value })
+                }
+                className="border px-2 py-1 rounded"
+              />
+              <button
+                onClick={() => handleUpdate(slot.id)}
+                className="bg-green-600 text-white px-2 py-1 rounded"
+              >
+                Save
+              </button>
+            </>
+          ) : (
+            <>
+              <span>
+                Day {slot.dayOfWeek} — {slot.startTime} to {slot.endTime}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setEditingId(slot.id);
+                    setEditSlot(slot);
+                  }}
+                  className="bg-yellow-500 text-white px-2 py-1 rounded"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(slot.id)}
+                  className="bg-red-600 text-white px-2 py-1 rounded"
+                >
+                  Delete
+                </button>
               </div>
-            ) : (
-              <>
-                <span className="w-1/2">
-                  Day {slot.dayOfWeek} — {slot.startTime} to {slot.endTime}
-                  {slot.isBooked && " (Booked)"}
-                </span>
-                <div className="flex gap-2 mt-1 sm:mt-0">
-                  <button
-                    onClick={() => {
-                      setEditingId(slot.id);
-                      setEditSlot(slot);
-                    }}
-                    className="bg-yellow-500 text-white px-2 py-1 rounded"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(slot.id)}
-                    className="bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-        {slots.length === 0 && (
-          <p className="text-gray-500 mt-2">You haven't added any availability yet.</p>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

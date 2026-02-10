@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
 import { getCurrentUser } from "@/services/auth/auth";
+import { getTutors } from "@/services/dashboard/tutor";
 
 interface Tutor {
   id: string;
@@ -44,21 +45,22 @@ export default function FindTutorsPage() {
     }, []);
 
   // Fetch tutors
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tutors`);
-        const data = await res.json();
-        const tutorArray = Array.isArray(data.data) ? data.data : [];
-        setTutors(tutorArray);
-        setFilteredTutors(tutorArray);
-      } catch {
-        setTutors([]);
-        setFilteredTutors([]);
-      }
-    };
-    fetchTutors();
-  }, []);
+useEffect(() => {
+  async function loadTutors() {
+    try {
+      const tutorArray = await getTutors();
+      setTutors(tutorArray);
+      setFilteredTutors(tutorArray);
+    } catch (err) {
+      console.error(err);
+      setTutors([]);
+      setFilteredTutors([]);
+    }
+  }
+
+  loadTutors();
+}, []);
+
 
   // Filter tutors
   useEffect(() => {

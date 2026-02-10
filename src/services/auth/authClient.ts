@@ -9,7 +9,6 @@ export async function login(data: { email: string; password: string }) {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Origin: APP_URL,
     },
     body: JSON.stringify(data),
   });
@@ -35,7 +34,6 @@ export async function register(data: {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Origin: APP_URL,
     },
     body: JSON.stringify(data),
   });

@@ -1,9 +1,45 @@
 "use client";
+import { updateBookingStatus } from "@/services/dashboard/booking";
 import { useState } from "react";
 
 export default function Bookings({ stats }: { stats: any }) {
   const [bookings, setBookings] = useState(stats.bookings || []);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  // const handleStatusChange = async (
+  //   bookingId: string,
+  //   status: "CONFIRMED" | "CANCELLED" | "COMPLETED",
+  // ) => {
+  //   try {
+  //     setLoadingId(bookingId);
+
+  //     const res = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`,
+  //       {
+  //         method: "PATCH",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         credentials: "include",
+  //         body: JSON.stringify({ status }),
+  //       },
+  //     );
+
+  //     if (!res.ok) throw new Error("Failed to update booking");
+
+  //     // Update booking status locally
+  //     setBookings((prev: any[]) =>
+  //       prev.map((b) =>
+  //         b.id === bookingId ? { ...b, status } : b,
+  //       ),
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Action failed ❌");
+  //   } finally {
+  //     setLoadingId(null);
+  //   }
+  // };
 
   const handleStatusChange = async (
     bookingId: string,
@@ -12,25 +48,11 @@ export default function Bookings({ stats }: { stats: any }) {
     try {
       setLoadingId(bookingId);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ status }),
-        },
-      );
+      await updateBookingStatus(bookingId, status);
 
-      if (!res.ok) throw new Error("Failed to update booking");
-
-      // Update booking status locally
+      // update local state
       setBookings((prev: any[]) =>
-        prev.map((b) =>
-          b.id === bookingId ? { ...b, status } : b,
-        ),
+        prev.map((b) => (b.id === bookingId ? { ...b, status } : b)),
       );
     } catch (err) {
       console.error(err);
@@ -51,10 +73,7 @@ export default function Bookings({ stats }: { stats: any }) {
       ) : (
         <ul className="space-y-3">
           {bookings.map((b: any) => (
-            <li
-              key={b.id}
-              className="p-3 rounded bg-gray-100 dark:bg-gray-700"
-            >
+            <li key={b.id} className="p-3 rounded bg-gray-100 dark:bg-gray-700">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-semibold">{b.student?.name}</p>
@@ -72,9 +91,7 @@ export default function Bookings({ stats }: { stats: any }) {
                     <>
                       <button
                         disabled={loadingId === b.id}
-                        onClick={() =>
-                          handleStatusChange(b.id, "CONFIRMED")
-                        }
+                        onClick={() => handleStatusChange(b.id, "CONFIRMED")}
                         className="px-3 py-1 bg-green-500 text-white rounded disabled:opacity-50"
                       >
                         Confirm
@@ -82,9 +99,7 @@ export default function Bookings({ stats }: { stats: any }) {
 
                       <button
                         disabled={loadingId === b.id}
-                        onClick={() =>
-                          handleStatusChange(b.id, "CANCELLED")
-                        }
+                        onClick={() => handleStatusChange(b.id, "CANCELLED")}
                         className="px-3 py-1 bg-red-500 text-white rounded disabled:opacity-50"
                       >
                         Cancel
@@ -95,9 +110,7 @@ export default function Bookings({ stats }: { stats: any }) {
                   {b.status === "CONFIRMED" && (
                     <button
                       disabled={loadingId === b.id}
-                      onClick={() =>
-                        handleStatusChange(b.id, "COMPLETED")
-                      }
+                      onClick={() => handleStatusChange(b.id, "COMPLETED")}
                       className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
                     >
                       Complete

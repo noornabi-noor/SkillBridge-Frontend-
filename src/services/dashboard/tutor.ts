@@ -160,3 +160,132 @@ export async function getTutorDashboardStats(userId: string) {
     upcomingSessionsList: upcomingBookings,
   };
 }
+
+export async function getTopRatedTutor() {
+  const res = await fetch(`${API_URL}/api/tutors/top-tutor`, {
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if(!res.ok){
+    throw new Error("Failed to fetch tutors");
+  }
+
+  const json = await res.json();
+
+  return json.data;
+}
+
+export async function getCategories() {
+  const res = await fetch(`${API_URL}/api/categories`, {
+    cache: "no-store",
+    credentials: "include", // include cookies for auth
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  const json = await res.json();
+
+  // Return only categories with at least one tutor
+  return json.data.filter((c: any) => c.tutors && c.tutors.length > 0);
+}
+
+export type BecomeTutorPayload = {
+  bio: string;
+  experience: number;
+  pricePerHour: number;
+  categories: string[];
+};
+
+export async function becomeTutor(payload: BecomeTutorPayload) {
+  const res = await fetch(`${API_URL}/api/tutors`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include", // send cookies
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to become tutor");
+  }
+
+  return data;
+}
+
+export async function getTutors() {
+  const res = await fetch(`${API_URL}/api/tutors`, {
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch tutors");
+  }
+
+  const json = await res.json();
+
+  return Array.isArray(json.data) ? json.data : [];
+}
+
+interface UpdateUserPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  image?: string;
+}
+
+interface UpdateTutorPayload {
+  bio?: string;
+  experience?: number;
+  pricePerHour?: number;
+  categories?: string[];
+}
+
+export async function updateUserProfile(
+  userId: string,
+  payload: UpdateUserPayload,
+) {
+  const res = await fetch(`${API_URL}/api/users/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!res.ok) {
+    throw new Error("Failed to update user profile");
+  }
+
+  return res.json();
+}
+
+export async function upsertTutorProfile(
+  payload: UpdateTutorPayload,
+) {
+  const res = await fetch(`${API_URL}/api/tutors`, {
+    method: "PATCH", // backend already handles create/update
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!res.ok) {
+    throw new Error("Failed to update tutor profile");
+  }
+
+  return res.json();
+}

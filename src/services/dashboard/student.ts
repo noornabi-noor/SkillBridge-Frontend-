@@ -40,17 +40,3 @@ export async function getStudentBookings() {
   const json = await res.json();
   return Array.isArray(json.data) ? json.data : []; 
 }
-
-export async function getMyBookings() {
-  const res = await fetch(`${API_URL}/api/bookings/student/me`, {
-    credentials: "include",
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch bookings");
-  }
-
-  const json = await res.json();
-  return json.data;
-}

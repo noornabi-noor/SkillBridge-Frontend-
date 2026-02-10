@@ -1,4 +1,5 @@
 // app/(DashboardLayouts)/dashboard/page.tsx
+
 import { getCurrentUser } from "@/services/auth/auth";
 import { redirect } from "next/navigation";
 import AdminDashboard from "./admin/AdminDashboard";
