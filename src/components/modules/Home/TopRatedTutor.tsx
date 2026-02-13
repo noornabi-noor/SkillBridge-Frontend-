@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getTopRatedTutor } from "@/services/dashboard/tutor";
+import { getTopRatedTutor } from "@/services/tutors/tutors";
 
 interface Tutor {
   id: string;

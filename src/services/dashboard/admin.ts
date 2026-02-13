@@ -1,9 +1,10 @@
+// admin.ts
+
 "use server";
 
 import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function getAllUsersAdmin() {
   const cookieStore = await cookies();
@@ -227,8 +228,7 @@ export async function deleteReviewAdmin(reviewId: string) {
   const res = await fetch(
     `${API_URL}/api/reviews/admin/${reviewId}`,
     {
-      method: "DELETE",
-      credentials: "include", 
+      method: "DELETE", 
       headers: {
       Cookie: cookieHeader,
     },

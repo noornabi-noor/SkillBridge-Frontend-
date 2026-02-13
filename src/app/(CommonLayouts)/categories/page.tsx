@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
 import { getCurrentUser } from "@/services/auth/auth";
-import { getCategories } from "@/services/dashboard/tutor";
+import { getCategories } from "@/services/tutors/tutors";
+
 
 interface User {
   name: string;

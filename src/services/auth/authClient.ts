@@ -1,10 +1,9 @@
 // services/auth/authClient.ts
 import { authClient } from "./auth-client";
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function login(data: { email: string; password: string }) {
-  const res = await fetch(`${API_URL}/api/auth/sign-in/email`, {
+  const res = await fetch("/api/auth/sign-in/email", {
     method: "POST",
     credentials: "include",
     headers: {
@@ -29,7 +28,7 @@ export async function register(data: {
   role: string;
   image?: string;
 }) {
-  const res = await fetch(`${API_URL}/api/auth/sign-up/email`, {
+  const res = await fetch("/api/auth/sign-up/email", {
     method: "POST",
     credentials: "include",
     headers: {
@@ -59,7 +58,7 @@ export async function loginWithGoogle() {
 }
 
 export async function logout() {
-  const res = await fetch(`${API_URL}/api/auth/sign-out`, {
+  const res = await fetch("/api/auth/sign-out", {
     method: "POST",
     credentials: "include",
   });

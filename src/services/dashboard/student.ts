@@ -4,20 +4,6 @@ import { cookies } from "next/headers";
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
-export async function getAllTutors() {
-  const res = await fetch(`${API_URL}/api/tutors`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch tutors");
-  }
-
-  const json = await res.json();
-
-  return json.data;
-}
-
 export async function getStudentBookings() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -28,7 +14,7 @@ export async function getStudentBookings() {
   const res = await fetch(`${API_URL}/api/bookings`, {
     headers: {
       Cookie: cookieHeader,
-      Origin: APP_URL,
+      // Origin: APP_URL,
     },
     cache: "no-store",
   });

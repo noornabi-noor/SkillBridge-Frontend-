@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
 import { getCurrentUser } from "@/services/auth/auth";
-import { getTutors } from "@/services/dashboard/tutor";
+import { getTutors } from "@/services/tutors/tutors";
 
 interface Tutor {
   id: string;

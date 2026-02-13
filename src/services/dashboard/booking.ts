@@ -1,7 +1,8 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+// booking.ts
+// const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function getMyBookings() {
-  const res = await fetch(`${API_URL}/api/bookings/student/me`, {
+  const res = await fetch(`/api/bookings/student/me`, {
     cache: "no-store",
     credentials: "include",
   });
@@ -20,7 +21,7 @@ export async function createBooking(payload: {
   startTime: string;
   endTime: string;
 }) {
-  const res = await fetch(`${API_URL}/api/bookings`, {
+  const res = await fetch(`/api/bookings`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -38,7 +39,7 @@ export async function createBooking(payload: {
 }
 
 export async function getStudentBookings(studentId: string) {
-  const res = await fetch(`${API_URL}/api/bookings`, {
+  const res = await fetch(`/api/bookings`, {
     credentials: "include",
     cache: "no-store",
   });
@@ -55,7 +56,7 @@ export async function updateBookingStatus(
   bookingId: string,
   status: "CONFIRMED" | "CANCELLED" | "COMPLETED",
 ) {
-  const res = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+  const res = await fetch(`/api/bookings/${bookingId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export async function updateBookingStatus(
 }
 
 export async function getStudentOwnBookings() {
-  const res = await fetch(`${API_URL}/api/bookings/student/me`, {
+  const res = await fetch(`/api/bookings/student/me`, {
     credentials: "include",
     cache: "no-store",
   });
@@ -86,7 +87,7 @@ export async function getStudentOwnBookings() {
 }
 
 export async function cancelBooking(bookingId: string) {
-  const res = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+  const res = await fetch(`/api/bookings/${bookingId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -104,7 +105,8 @@ export async function cancelBooking(bookingId: string) {
 /* ================= AVAILABILITY ================= */
 
 export async function getTutorAvailability(tutorId: string) {
-  const res = await fetch(`${API_URL}/api/availability/tutor/${tutorId}`, {
+  const res = await fetch(`/api/availability/tutor/${tutorId}`, {
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -116,7 +118,6 @@ export async function getTutorAvailability(tutorId: string) {
   return json.data || [];
 }
 
-
 export interface Booking {
   id: string;
   studentId: string;
@@ -126,7 +127,7 @@ export interface Booking {
 
 export async function getBookingsByStudent(studentId: string): Promise<Booking[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
+    const res = await fetch(`/api/bookings`, {
       credentials: "include",
     });
 

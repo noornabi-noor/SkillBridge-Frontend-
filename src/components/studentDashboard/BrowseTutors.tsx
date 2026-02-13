@@ -1,8 +1,9 @@
 "use client";
 
 import { createBooking, getMyBookings } from "@/services/dashboard/booking";
-import { getAllTutors } from "@/services/dashboard/student";
+// import { getAllTutors } from "@/services/dashboard/student";
 import { getTutorAvailability } from "@/services/dashboard/tutorAvailability";
+import { getAllTutors } from "@/services/student/student";
 import { useEffect, useState } from "react";
 
 interface Tutor {

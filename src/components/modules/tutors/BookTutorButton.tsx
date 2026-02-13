@@ -80,18 +80,6 @@ export default function BookTutorButton({
     }
   }, [showModal]);
 
-  // const fetchAvailability = async () => {
-  //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/availability/tutor/${tutor.id}`);
-  //   const data = await res.json();
-  //   setAvailability(data.data || []);
-  // };
-
-  // const fetchBookings = async () => {
-  //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`, { credentials: "include" });
-  //   const data = await res.json();
-  //   setBookings(data.data || []);
-  // };
-
   const fetchAvailability = async () => {
     try {
       const data = await getTutorAvailability(tutor.id);

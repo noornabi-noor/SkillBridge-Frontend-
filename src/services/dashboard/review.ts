@@ -1,7 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getStudentReviews(studentId: string) {
-  const res = await fetch(`${API_URL}/api/reviews?studentId=${studentId}`, {
+  const res = await fetch(`/api/reviews?studentId=${studentId}`, {
     credentials: "include",
     cache: "no-store",
   });
@@ -19,7 +19,7 @@ export async function createReview(payload: {
   rating: number;
   comment: string;
 }) {
-  const res = await fetch(`${API_URL}/api/reviews`, {
+  const res = await fetch(`/api/reviews`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -36,7 +36,7 @@ export async function updateReview(
   reviewId: string,
   payload: { rating: number; comment: string }
 ) {
-  const res = await fetch(`${API_URL}/api/reviews/${reviewId}`, {
+  const res = await fetch(`/api/reviews/${reviewId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -50,7 +50,7 @@ export async function updateReview(
 }
 
 export async function deleteReview(reviewId: string) {
-  const res = await fetch(`${API_URL}/api/reviews/${reviewId}`, {
+  const res = await fetch(`/api/reviews/${reviewId}`, {
     method: "DELETE",
     credentials: "include",
   });

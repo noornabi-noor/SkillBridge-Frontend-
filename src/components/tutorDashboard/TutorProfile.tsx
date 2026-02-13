@@ -1,6 +1,7 @@
 "use client";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-import { getTutorDashboardStats, updateUserProfile, upsertTutorProfile } from "@/services/dashboard/tutor";
+import { getTutorDashboardStats } from "@/services/dashboard/tutor";
+import { updateUserProfile, upsertTutorProfile } from "@/services/tutors/tutors";
 import { useState } from "react";
 
 interface TutorProfileProps {
@@ -26,76 +27,6 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
         .filter(Boolean)
         .join(",") || "",
   });
-
-  // const handleSave = async () => {
-  //   if (!stats?.user?.id) {
-  //     alert("User data not loaded yet ❌");
-  //     return;
-  //   }
-
-  //   try {
-  //     // 1️⃣ Update main user profile
-  //     const userRes = await fetch(`${API_URL}/api/users/${stats.user.id}`, {
-  //       method: "PATCH",
-  //       headers: { "Content-Type": "application/json" },
-  //       credentials: "include", // important
-  //       body: JSON.stringify({
-  //         name: formData.name,
-  //         email: formData.email,
-  //         phone: formData.phone,
-  //         image: formData.image,
-  //       }),
-  //     });
-
-  //     if (userRes.status === 401) {
-  //       alert("Unauthorized ❌: Please login again");
-  //       return;
-  //     }
-
-  //     if (!userRes.ok) throw new Error("Failed to update user profile");
-
-  //     // 2️⃣ Create or update tutor profile
-  //     const hasTutorData =
-  //       formData.bio ||
-  //       formData.experience ||
-  //       formData.rate ||
-  //       formData.categories;
-
-  //     if (hasTutorData) {
-  //       const method = stats.profile?.id ? "PATCH" : "POST";
-
-  //       const tutorRes = await fetch(`${API_URL}/api/tutors`, {
-  //         method: "PATCH",
-  //         headers: { "Content-Type": "application/json" },
-  //         credentials: "include",
-  //         body: JSON.stringify({
-  //           bio: formData.bio,
-  //           experience: Number(formData.experience) || 0,
-  //           pricePerHour: Number(formData.rate) || 0,
-  //           categories: formData.categories
-  //             .split(",")
-  //             .map((c: string) => c.trim())
-  //             .filter(Boolean),
-  //         }),
-  //       });
-  //       if (tutorRes.status === 401) {
-  //         alert("Unauthorized ❌: Please login again");
-  //         return;
-  //       }
-
-  //       if (!tutorRes.ok) throw new Error("Failed to update tutor profile");
-  //     }
-
-  //     // 3️⃣ Refresh dashboard data
-  //     const updatedStats = await getTutorDashboardStats(stats.user.id);
-  //     setStats(updatedStats);
-  //     setIsEditing(false);
-  //     alert("Profile updated successfully ✅");
-  //   } catch (error: any) {
-  //     console.error("Profile save error:", error);
-  //     alert("Failed to save profile ❌: " + error.message);
-  //   }
-  // };
 
     const handleSave = async () => {
     if (!stats?.user?.id) {

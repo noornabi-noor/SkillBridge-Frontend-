@@ -1,4 +1,3 @@
-
 export interface Student {
   id: string;
   name: string;
@@ -8,11 +7,8 @@ export interface Student {
 
 export async function getStudentById(studentId: string): Promise<Student | null> {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    console.log("API_URL:", API_URL);
-    if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL not defined");
 
-    const res = await fetch(`${API_URL}/api/users/${studentId}`, {
+    const res = await fetch(`/api/users/${studentId}`, {
         cache: "no-store",
         credentials: "include",
     });
@@ -42,10 +38,8 @@ export async function updateStudentProfile(
   updates: Partial<Student>
 ): Promise<boolean> {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL not defined");
 
-    const res = await fetch(`${API_URL}/api/users/${studentId}`, {
+    const res = await fetch(`/api/users/${studentId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -63,4 +57,19 @@ export async function updateStudentProfile(
     console.error("Error updating student:", err);
     return false;
   }
+}
+
+export async function getAllTutors() {
+  const res = await fetch(`/api/tutors`, {
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch tutors");
+  }
+
+  const json = await res.json();
+
+  return json.data;
 }

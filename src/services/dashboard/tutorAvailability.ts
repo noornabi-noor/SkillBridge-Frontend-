@@ -1,10 +1,7 @@
-// "use server";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
+// const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // GET logged-in tutor's slots
 export async function getMyAvailability() {
-  const res = await fetch(`${API_URL}/api/availability/me`, {
+  const res = await fetch(`/api/availability/me`, {
     credentials: "include", // important
     cache: "no-store",
   });
@@ -19,7 +16,7 @@ export async function getMyAvailability() {
 
 // CREATE slot
 export async function createAvailability(slot: { dayOfWeek: number; startTime: string; endTime: string; }) {
-  const res = await fetch(`${API_URL}/api/availability/me`, {
+  const res = await fetch(`/api/availability/me`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // important
@@ -36,7 +33,7 @@ export async function createAvailability(slot: { dayOfWeek: number; startTime: s
 
 // UPDATE slot
 export async function updateAvailability(id: string, slot: { dayOfWeek: number; startTime: string; endTime: string; }) {
-  const res = await fetch(`${API_URL}/api/availability/${id}`, {
+  const res = await fetch(`/api/availability/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // important
@@ -53,7 +50,7 @@ export async function updateAvailability(id: string, slot: { dayOfWeek: number; 
 
 // DELETE slot
 export async function deleteAvailability(id: string) {
-  const res = await fetch(`${API_URL}/api/availability/${id}`, {
+  const res = await fetch(`/api/availability/${id}`, {
     method: "DELETE",
     credentials: "include", // important
   });
@@ -68,8 +65,9 @@ export async function deleteAvailability(id: string) {
 
 
 export async function getTutorAvailability(tutorId: string) {
-  const res = await fetch(`${API_URL}/api/availability/tutor/${tutorId}`, {
+  const res = await fetch(`/api/availability/tutor/${tutorId}`, {
     cache: "no-store",
+    credentials: "include",
   });
 
   if (!res.ok) {
