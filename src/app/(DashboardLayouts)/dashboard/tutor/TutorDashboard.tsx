@@ -21,11 +21,9 @@ export default function TutorDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "profile" | "availability" | "bookings" | "reviews" | "upcoming"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "profile" | "availability" | "bookings" | "reviews" | "upcoming">("overview");
 
-  // --- Persist activeTab in localStorage ---
+  // Persist activeTab in localStorage
   useEffect(() => {
     const savedTab = localStorage.getItem("activeTab") as
       | "overview"
@@ -39,7 +37,6 @@ export default function TutorDashboard() {
     if (savedTab) setActiveTab(savedTab);
   }, []);
 
-  // --- Save activeTab to localStorage whenever it changes ---
   useEffect(() => {
     localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
@@ -80,18 +77,11 @@ export default function TutorDashboard() {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-
       <div className="flex-1 p-6 overflow-auto">
         <Navbar user={user} onLogout={handleLogout} />
-
         {activeTab === "overview" && <OverviewCards stats={stats} />}
-        {activeTab === "profile" && (
-          <TutorProfile stats={stats} setStats={setStats} />
-        )}
-        {activeTab === "availability" && (
-          // <TutorAvailability tutorId={stats.profile.id} />
-          <TutorAvailability />
-        )}
+        {activeTab === "profile" && <TutorProfile stats={stats} setStats={setStats} />}
+        {activeTab === "availability" && <TutorAvailability stats={stats} setActiveTab={setActiveTab} />}
         {activeTab === "bookings" && <Bookings stats={stats} />}
         {activeTab === "reviews" && <Reviews stats={stats} />}
         {activeTab === "upcoming" && <UpcomingSessions stats={stats} />}

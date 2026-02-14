@@ -38,8 +38,7 @@ export function SignupForm({
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const phone = (form.elements.namedItem("phone") as HTMLInputElement).value;
     const role = (form.elements.namedItem("role") as HTMLSelectElement).value;
-    const image = (form.elements.namedItem("image") as HTMLInputElement)
-      .value;
+    const image = (form.elements.namedItem("image") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement)
       .value;
     const confirmPassword = (
@@ -115,12 +114,16 @@ export function SignupForm({
                 <select
                   id="role"
                   name="role"
-                  className="w-full border rounded p-2 dark:text"
+                  className="w-full border rounded p-2 text-black dark:text-black bg-white dark:bg-white"
                   required
                 >
                   <option value="">Select a role</option>
-                  <option value="STUDENT">STUDENT</option>
-                  <option value="TUTOR">TUTOR</option>
+                  <option value="STUDENT" className="text-black">
+                    STUDENT
+                  </option>
+                  <option value="TUTOR" className="text-black">
+                    TUTOR
+                  </option>
                 </select>
               </Field>
 

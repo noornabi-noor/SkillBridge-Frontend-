@@ -6,41 +6,6 @@ export default function Bookings({ stats }: { stats: any }) {
   const [bookings, setBookings] = useState(stats.bookings || []);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  // const handleStatusChange = async (
-  //   bookingId: string,
-  //   status: "CONFIRMED" | "CANCELLED" | "COMPLETED",
-  // ) => {
-  //   try {
-  //     setLoadingId(bookingId);
-
-  //     const res = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`,
-  //       {
-  //         method: "PATCH",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         credentials: "include",
-  //         body: JSON.stringify({ status }),
-  //       },
-  //     );
-
-  //     if (!res.ok) throw new Error("Failed to update booking");
-
-  //     // Update booking status locally
-  //     setBookings((prev: any[]) =>
-  //       prev.map((b) =>
-  //         b.id === bookingId ? { ...b, status } : b,
-  //       ),
-  //     );
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Action failed ❌");
-  //   } finally {
-  //     setLoadingId(null);
-  //   }
-  // };
-
   const handleStatusChange = async (
     bookingId: string,
     status: "CONFIRMED" | "CANCELLED" | "COMPLETED",

@@ -1,5 +1,6 @@
 // app/(DashboardLayouts)/dashboard/layout.tsx
 import ToastProvider from "@/components/providers/ToastProvider";
+import Footer from "@/components/shared/Footer";
 import { ThemeProvider } from "@/provider/theme-provider";
 import { getCurrentUser } from "@/services/auth/auth";
 import { redirect } from "next/navigation";
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
           >
             <ToastProvider />
             {children}
+            <Footer/>
           </ThemeProvider>
   </div>;
 }

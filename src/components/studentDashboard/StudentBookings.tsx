@@ -38,24 +38,6 @@ export default function StudentBookings({ studentId }: Props) {
     fetchBookings();
   }, [studentId]);
 
-  //   const fetchBookings = async () => {
-  //   try {
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/student/me`, {
-  //       credentials: "include",
-  //     });
-
-  //     if (!res.ok) throw new Error("Failed to fetch bookings");
-
-  //     const data = await res.json();
-  //     setBookings(Array.isArray(data.data) ? data.data : []);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setBookings([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -68,27 +50,6 @@ export default function StudentBookings({ studentId }: Props) {
       setLoading(false);
     }
   };
-
-  // const handleCancelBooking = async (bookingId: string) => {
-  //   const ok = confirm("Are you sure you want to cancel this booking?");
-  //   if (!ok) return;
-
-  //   try {
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}`, {
-  //       method: "PATCH",
-  //       headers: { "Content-Type": "application/json" },
-  //       credentials: "include",
-  //       body: JSON.stringify({ status: "CANCELLED" }),
-  //     });
-
-  //     if (!res.ok) throw new Error("Cancel failed");
-
-  //     fetchBookings();
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Failed to cancel booking ❌");
-  //   }
-  // };
 
   const handleCancelBooking = async (bookingId: string) => {
     const ok = confirm("Are you sure you want to cancel this booking?");

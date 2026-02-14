@@ -1,7 +1,6 @@
 "use client";
 
 import { createBooking, getMyBookings } from "@/services/dashboard/booking";
-// import { getAllTutors } from "@/services/dashboard/student";
 import { getTutorAvailability } from "@/services/dashboard/tutorAvailability";
 import { getAllTutors } from "@/services/student/student";
 import { useEffect, useState } from "react";
@@ -31,30 +30,10 @@ interface Availability {
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// --- Convert time string to minutes
-const toMinutes = (time: string): number => {
-  time = time.trim();
-
-  // 24-hour format HH:MM
-  const match24 = time.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
-  if (match24) {
-    const h = Number(match24[1]);
-    const m = Number(match24[2]);
-    return h * 60 + m;
-  }
-
-  // 12-hour format HH:MM AM/PM
-  const match12 = time.match(/^(\d{1,2}):([0-5]\d)\s?(AM|PM)$/i);
-  if (match12) {
-    let h = Number(match12[1]);
-    const m = Number(match12[2]);
-    const period = match12[3].toUpperCase();
-    if (h === 12) h = 0;
-    if (period === "PM") h += 12;
-    return h * 60 + m;
-  }
-
-  throw new Error("Invalid time format: " + time);
+// --- Convert HH:MM to minutes (24h format only)
+const toMinutes24h = (time: string): number => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
 };
 
 // --- Minutes → 12h
@@ -82,9 +61,7 @@ export default function BrowseTutors() {
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [freeSlots, setFreeSlots] = useState<
-    { startTime: number; endTime: number }[]
-  >([]);
+  const [freeSlots, setFreeSlots] = useState<{ startTime: number; endTime: number }[]>([]);
   const [selectedStartTime, setSelectedStartTime] = useState("");
   const [selectedEndTime, setSelectedEndTime] = useState("");
 
@@ -137,8 +114,8 @@ export default function BrowseTutors() {
     let slots: { startTime: number; endTime: number }[] = [];
 
     dayAvail.forEach((a) => {
-      let start = toMinutes(a.startTime);
-      let end = toMinutes(a.endTime);
+      let start = toMinutes24h(a.startTime);
+      let end = toMinutes24h(a.endTime);
       if (end === 0) end = 24 * 60;
 
       let tmp = [{ startTime: start, endTime: end }];
@@ -151,21 +128,18 @@ export default function BrowseTutors() {
             ["PENDING", "CONFIRMED"].includes(b.status),
         )
         .map((b) => {
-          let bStart = toMinutes(b.startTime);
-          let bEnd = toMinutes(b.endTime);
+          let bStart = toMinutes24h(b.startTime);
+          let bEnd = toMinutes24h(b.endTime);
           if (bEnd === 0) bEnd = 24 * 60;
           return { startTime: bStart, endTime: bEnd };
         });
 
       dayBookings.forEach((b) => {
         tmp = tmp.flatMap((slot) => {
-          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime)
-            return [slot];
+          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime) return [slot];
           const res: { startTime: number; endTime: number }[] = [];
-          if (b.startTime > slot.startTime)
-            res.push({ startTime: slot.startTime, endTime: b.startTime });
-          if (b.endTime < slot.endTime)
-            res.push({ startTime: b.endTime, endTime: slot.endTime });
+          if (b.startTime > slot.startTime) res.push({ startTime: slot.startTime, endTime: b.startTime });
+          if (b.endTime < slot.endTime) res.push({ startTime: b.endTime, endTime: slot.endTime });
           return res;
         });
       });
@@ -185,27 +159,16 @@ export default function BrowseTutors() {
   };
 
   const bookTutor = async () => {
-    if (
-      !selectedTutor ||
-      !selectedDate ||
-      !selectedStartTime ||
-      !selectedEndTime
-    )
+    if (!selectedTutor || !selectedDate || !selectedStartTime || !selectedEndTime)
       return alert("Select date and time");
 
-    const startMin = toMinutes(selectedStartTime);
-    const endMin = toMinutes(selectedEndTime);
+    const startMin = toMinutes24h(selectedStartTime);
+    const endMin = toMinutes24h(selectedEndTime);
 
-    // Only check freeSlots if there is availability
     if (availability.length > 0) {
-      const valid = freeSlots.some(
-        (s) =>
-          startMin >= s.startTime && endMin <= s.endTime && startMin < endMin,
-      );
-      if (!valid)
-        return alert("Selected time is invalid or overlaps existing bookings");
+      const valid = freeSlots.some((s) => startMin >= s.startTime && endMin <= s.endTime && startMin < endMin);
+      if (!valid) return alert("Selected time is invalid or overlaps existing bookings");
     } else if (startMin >= endMin) {
-      // If no availability, just check start < end
       return alert("End time must be after start time");
     }
 
@@ -217,7 +180,6 @@ export default function BrowseTutors() {
         endTime: selectedEndTime,
       });
 
-      // if your API returns { success: true/false, message: string }
       if (!data.success) {
         throw new Error(data.message || "Booking failed");
       }
@@ -256,9 +218,7 @@ export default function BrowseTutors() {
                   {tutor.user.email}
                 </p>
                 {tutor.bio && (
-                  <p className="text-sm mt-1 text-gray-700 dark:text-gray-300">
-                    {tutor.bio}
-                  </p>
+                  <p className="text-sm mt-1 text-gray-700 dark:text-gray-300">{tutor.bio}</p>
                 )}
                 {tutor.pricePerHour && (
                   <p className="text-sm mt-1 font-medium text-gray-800 dark:text-gray-200">
@@ -284,29 +244,22 @@ export default function BrowseTutors() {
             <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
               {selectedTutor.user.name}
             </h2>
-            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
-              Availability
-            </h3>
+            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Availability</h3>
             {availability.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No availability set. You can book any time.
-              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">No availability set. You can book any time.</p>
             ) : (
               availability.map((a) => (
                 <div
                   key={a.id}
                   className="border rounded p-2 mb-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
-                  <strong>{days[a.dayOfWeek]}</strong>{" "}
-                  {minutesToTime12h(toMinutes(a.startTime))} –{" "}
-                  {minutesToTime12h(toMinutes(a.endTime))}
+                  <strong>{days[a.dayOfWeek]}</strong> {minutesToTime12h(toMinutes24h(a.startTime))} –{" "}
+                  {minutesToTime12h(toMinutes24h(a.endTime))}
                 </div>
               ))
             )}
 
-            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">
-              Select Date:
-            </label>
+            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">Select Date:</label>
             <input
               type="date"
               value={selectedDate}
@@ -314,23 +267,17 @@ export default function BrowseTutors() {
               className="border w-full mb-3 px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
 
-            {/* Show booking inputs always */}
             {selectedDate && (
               <>
-                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
-                  Select Time
-                </h3>
-
+                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Select Time</h3>
                 {availability.length > 0 ? (
-                  // If availability exists, show free slots
                   freeSlots.map((slot) => (
                     <div
                       key={`${slot.startTime}-${slot.endTime}`}
                       className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
                       <div>
-                        Free Slot: {minutesToTime12h(slot.startTime)} –{" "}
-                        {minutesToTime12h(slot.endTime)}
+                        Free Slot: {minutesToTime12h(slot.startTime)} – {minutesToTime12h(slot.endTime)}
                       </div>
                       <div className="flex gap-2">
                         <input
@@ -343,10 +290,7 @@ export default function BrowseTutors() {
                         />
                         <input
                           type="time"
-                          min={
-                            selectedStartTime ||
-                            minutesToTime24h(slot.startTime)
-                          }
+                          min={selectedStartTime || minutesToTime24h(slot.startTime)}
                           max={minutesToTime24h(slot.endTime)}
                           value={selectedEndTime}
                           onChange={(e) => setSelectedEndTime(e.target.value)}
@@ -356,7 +300,6 @@ export default function BrowseTutors() {
                     </div>
                   ))
                 ) : (
-                  // No availability → allow any time
                   <div className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <div>Pick any time</div>
                     <div className="flex gap-2">
