@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/services/auth/auth";
+import LoadingPage from "@/app/loading";
 
 export default function AdminProfile() {
   const [user, setUser] = useState<any>(null);
@@ -27,11 +28,7 @@ export default function AdminProfile() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-60 text-gray-500 dark:text-gray-400">
-        Loading...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   return (
@@ -56,8 +53,10 @@ export default function AdminProfile() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {user.email}
             </p>
-            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium rounded-full
-              bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+            <span
+              className="inline-block mt-2 px-3 py-1 text-xs font-medium rounded-full
+              bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
+            >
               {user.role}
             </span>
           </div>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/services/auth/auth-client";
+import LoadingPage from "@/app/loading";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function VerifyEmailPage() {
   }, [router]);
 
   if (status === "loading") {
-    return <p>Verifying your email...</p>;
+    return <LoadingPage />;
   }
 
   if (status === "success") {

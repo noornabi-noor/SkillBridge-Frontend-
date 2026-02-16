@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getAdminDashboardStats } from "@/services/dashboard/admin";
+import LoadingPage from "@/app/loading";
 
 export default function AdminOverview() {
   const [stats, setStats] = useState<{
@@ -25,11 +26,7 @@ export default function AdminOverview() {
   }, []);
 
   if (!stats) {
-    return (
-      <div className="flex justify-center py-10 text-gray-500 dark:text-gray-400">
-        Loading stats...
-      </div>
-    );
+    return <LoadingPage/>
   }
 
   return (

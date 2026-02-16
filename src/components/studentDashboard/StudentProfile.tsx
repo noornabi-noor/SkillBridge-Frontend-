@@ -6,6 +6,7 @@ import {
   getStudentById,
   updateStudentProfile,
 } from "@/services/student/student";
+import LoadingPage from "@/app/loading";
 
 interface Props {
   studentId: string;
@@ -80,7 +81,7 @@ export default function StudentProfile({ studentId }: Props) {
   // RENDER
   // ========================
   if (initialLoading) {
-    return <p className="text-gray-500">Loading profile...</p>;
+    return <LoadingPage/>;
   }
 
   if (!student) {

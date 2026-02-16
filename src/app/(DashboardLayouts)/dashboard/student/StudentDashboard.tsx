@@ -21,6 +21,7 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
 import Footer from "@/components/shared/Footer";
+import LoadingPage from "@/app/loading";
 
 type ActiveTab =
   | "overview"
@@ -66,11 +67,7 @@ export default function StudentDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-500 dark:text-gray-300">
-        Loading...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   const menuItems: {

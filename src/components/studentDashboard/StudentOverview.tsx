@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingPage from "@/app/loading";
 import { Booking, getBookingsByStudent } from "@/services/dashboard/booking";
 import { useEffect, useState } from "react";
 
@@ -22,16 +23,17 @@ export default function StudentOverview({ studentId }: Props) {
   }, [studentId]);
 
   if (loading) {
-    return <p className="text-gray-500 dark:text-gray-300">Loading overview...</p>;
+    return <LoadingPage />;
   }
-
   const today = new Date();
 
   const totalSessions = bookings.length;
   const pendingSessions = bookings.filter((b) => b.status === "PENDING").length;
-  const completedSessions = bookings.filter((b) => b.status === "COMPLETED").length;
+  const completedSessions = bookings.filter(
+    (b) => b.status === "COMPLETED",
+  ).length;
   const upcomingSessions = bookings.filter(
-    (b) => new Date(b.date) >= today && b.status !== "CANCELLED"
+    (b) => new Date(b.date) >= today && b.status !== "CANCELLED",
   ).length;
 
   const cardClasses =
@@ -53,12 +55,16 @@ export default function StudentOverview({ studentId }: Props) {
 
       <div className={cardClasses}>
         <p className={labelClasses}>Pending</p>
-        <h2 className={`${numberClasses} text-yellow-500`}>{pendingSessions}</h2>
+        <h2 className={`${numberClasses} text-yellow-500`}>
+          {pendingSessions}
+        </h2>
       </div>
 
       <div className={cardClasses}>
         <p className={labelClasses}>Completed</p>
-        <h2 className={`${numberClasses} text-green-600`}>{completedSessions}</h2>
+        <h2 className={`${numberClasses} text-green-600`}>
+          {completedSessions}
+        </h2>
       </div>
     </div>
   );

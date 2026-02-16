@@ -6,6 +6,7 @@ import {
   getAllBookingsAdmin,
 } from "@/services/dashboard/admin";
 import { toast } from "sonner";
+import LoadingPage from "@/app/loading";
 
 type Booking = {
   id: string;
@@ -26,9 +27,11 @@ type Booking = {
 };
 
 const statusColor = {
-  PENDING: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
+  PENDING:
+    "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
   CONFIRMED: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  COMPLETED: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+  COMPLETED:
+    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
   CANCELLED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
 };
 
@@ -59,15 +62,15 @@ export default function AdminBookingsTable() {
 
   const handleStatusChange = async (
     bookingId: string,
-    status: Booking["status"]
+    status: Booking["status"],
   ) => {
     try {
       setUpdatingId(bookingId);
       const updated = await updateBookingStatusAdmin(bookingId, status);
       setBookings((prev) =>
         prev.map((b) =>
-          b.id === bookingId ? { ...b, status: updated.status } : b
-        )
+          b.id === bookingId ? { ...b, status: updated.status } : b,
+        ),
       );
       toast.success("Booking updated");
     } catch (err: any) {
@@ -78,11 +81,7 @@ export default function AdminBookingsTable() {
   };
 
   if (loading) {
-    return (
-      <div className="py-10 text-center text-gray-500 dark:text-gray-400">
-        Loading bookings...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   return (
@@ -147,10 +146,7 @@ export default function AdminBookingsTable() {
                 value={b.status}
                 disabled={updatingId === b.id}
                 onChange={(e) =>
-                  handleStatusChange(
-                    b.id,
-                    e.target.value as Booking["status"]
-                  )
+                  handleStatusChange(b.id, e.target.value as Booking["status"])
                 }
                 className="px-2 py-1 rounded border text-sm
                   bg-white dark:bg-gray-800
@@ -224,7 +220,7 @@ export default function AdminBookingsTable() {
                       onChange={(e) =>
                         handleStatusChange(
                           b.id,
-                          e.target.value as Booking["status"]
+                          e.target.value as Booking["status"],
                         )
                       }
                       className="px-2 py-1 rounded border

@@ -31,36 +31,35 @@ export default function FindTutorsPage() {
   const [maxPrice, setMaxPrice] = useState<number | "">("");
 
   const [user, setUser] = useState<any>(null);
-  
-    useEffect(() => {
-      async function fetchUser() {
-        try {
-          const currentUser = await getCurrentUser();
-          setUser(currentUser);
-        } catch (err) {
-          console.error(err);
-        }
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (err) {
+        console.error(err);
       }
-      fetchUser();
-    }, []);
+    }
+    fetchUser();
+  }, []);
 
   // Fetch tutors
-useEffect(() => {
-  async function loadTutors() {
-    try {
-      const tutorArray = await getTutors();
-      setTutors(tutorArray);
-      setFilteredTutors(tutorArray);
-    } catch (err) {
-      console.error(err);
-      setTutors([]);
-      setFilteredTutors([]);
+  useEffect(() => {
+    async function loadTutors() {
+      try {
+        const tutorArray = await getTutors();
+        setTutors(tutorArray);
+        setFilteredTutors(tutorArray);
+      } catch (err) {
+        console.error(err);
+        setTutors([]);
+        setFilteredTutors([]);
+      }
     }
-  }
 
-  loadTutors();
-}, []);
-
+    loadTutors();
+  }, []);
 
   // Filter tutors
   useEffect(() => {
@@ -68,13 +67,15 @@ useEffect(() => {
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        t =>
+        (t) =>
           t.user.name.toLowerCase().includes(q) ||
-          t.subjects?.some(s => s.toLowerCase().includes(q))
+          t.subjects?.some((s) => s.toLowerCase().includes(q)),
       );
     }
-    if (minRating > 0) result = result.filter(t => (t.rating || 0) >= minRating);
-    if (maxPrice !== "") result = result.filter(t => (t.pricePerHour || 0) <= Number(maxPrice));
+    if (minRating > 0)
+      result = result.filter((t) => (t.rating || 0) >= minRating);
+    if (maxPrice !== "")
+      result = result.filter((t) => (t.pricePerHour || 0) <= Number(maxPrice));
     setFilteredTutors(result);
   }, [search, minRating, maxPrice, tutors]);
 
@@ -88,25 +89,49 @@ useEffect(() => {
           type="text"
           placeholder="Search by name or subject"
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border rounded px-3 py-2"
+          onChange={(e) => setSearch(e.target.value)}
+          className="
+      border border-gray-300 dark:border-gray-700
+      bg-white dark:bg-gray-800
+      text-gray-900 dark:text-gray-100
+      placeholder-gray-400 dark:placeholder-gray-500
+      rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500
+      transition-colors
+    "
         />
         <select
           value={minRating}
-          onChange={e => setMinRating(Number(e.target.value))}
-          className="border rounded px-3 py-2"
+          onChange={(e) => setMinRating(Number(e.target.value))}
+          className="
+      border border-gray-300 dark:border-gray-700
+      bg-white dark:bg-gray-800
+      text-gray-900 dark:text-gray-100
+      placeholder-gray-400 dark:placeholder-gray-500
+      rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500
+      transition-colors
+    "
         >
           <option value={0}>All Ratings</option>
           <option value={3}>3⭐ & up</option>
           <option value={4}>4⭐ & up</option>
           <option value={5}>5⭐</option>
         </select>
+
         <input
           type="number"
           placeholder="Max price ($)"
           value={maxPrice}
-          onChange={e => setMaxPrice(e.target.value ? Number(e.target.value) : "")}
-          className="border rounded px-3 py-2"
+          onChange={(e) =>
+            setMaxPrice(e.target.value ? Number(e.target.value) : "")
+          }
+          className="
+      border border-gray-300 dark:border-gray-700
+      bg-white dark:bg-gray-800
+      text-gray-900 dark:text-gray-100
+      placeholder-gray-400 dark:placeholder-gray-500
+      rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500
+      transition-colors
+    "
         />
       </div>
 
@@ -115,17 +140,26 @@ useEffect(() => {
         <p className="text-gray-500 text-center">No tutors found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {filteredTutors.map(tutor => (
-            <div key={tutor.id} className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-col">
+          {filteredTutors.map((tutor) => (
+            <div
+              key={tutor.id}
+              className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-col"
+            >
               <img
                 src={tutor.user.image || "/avatar.png"}
                 alt={tutor.user.name}
                 className="w-16 h-16 rounded-full mb-4 object-cover self-center"
               />
-              <h2 className="text-lg font-semibold text-center">{tutor.user.name}</h2>
+              <h2 className="text-lg font-semibold text-center">
+                {tutor.user.name}
+              </h2>
               <p className="mt-3 text-sm">{tutor.bio || "No bio available"}</p>
-              <p className="mt-2 font-medium">💰 ${tutor.pricePerHour ?? "N/A"}/hr</p>
-              {tutor.rating && <p className="text-yellow-500">⭐ {tutor.rating.toFixed(1)}</p>}
+              <p className="mt-2 font-medium">
+                💰 ${tutor.pricePerHour ?? "N/A"}/hr
+              </p>
+              {tutor.rating && (
+                <p className="text-yellow-500">⭐ {tutor.rating.toFixed(1)}</p>
+              )}
 
               <div className="mt-4 flex justify-between">
                 {/* Book button */}

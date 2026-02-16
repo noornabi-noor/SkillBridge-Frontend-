@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingPage from "@/app/loading";
 import { getStudentBookings } from "@/services/dashboard/booking";
 import {
   createReview,
@@ -135,10 +136,9 @@ export default function StudentReviews({ studentId }: Props) {
     }
   };
 
-  if (loading)
-    return (
-      <p className="text-gray-500 dark:text-gray-300">Loading reviews...</p>
-    );
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   const completedBookings = bookings.filter(
     (b) =>

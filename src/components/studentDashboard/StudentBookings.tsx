@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingPage from "@/app/loading";
 import {
   cancelBooking,
   getStudentOwnBookings,
@@ -64,7 +65,9 @@ export default function StudentBookings({ studentId }: Props) {
     }
   };
 
-  if (loading) return <p className="dark:text-gray-300">Loading bookings...</p>;
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6 transition-colors duration-300">

@@ -6,6 +6,7 @@ import {
   deleteReviewAdmin,
 } from "@/services/dashboard/admin";
 import { toast } from "sonner";
+import LoadingPage from "@/app/loading";
 
 export default function AdminReviewsTable() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -42,11 +43,7 @@ export default function AdminReviewsTable() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-10 text-gray-500 dark:text-gray-400">
-        Loading reviews...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (reviews.length === 0) {
@@ -97,9 +94,7 @@ export default function AdminReviewsTable() {
               </p>
 
               <p
-                className={`${
-                  isExpanded ? "" : "line-clamp-3"
-                } transition-all`}
+                className={`${isExpanded ? "" : "line-clamp-3"} transition-all`}
               >
                 <span className="font-medium">Comment:</span>{" "}
                 {review.comment || "-"}
@@ -107,9 +102,7 @@ export default function AdminReviewsTable() {
 
               {review.comment && review.comment.length > 120 && (
                 <button
-                  onClick={() =>
-                    setExpanded(isExpanded ? null : review.id)
-                  }
+                  onClick={() => setExpanded(isExpanded ? null : review.id)}
                   className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   {isExpanded ? "Read less" : "Read more"}

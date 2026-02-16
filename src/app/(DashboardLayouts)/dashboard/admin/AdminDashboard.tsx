@@ -19,6 +19,7 @@ import AdminReviewsTable from "@/components/adminDashboard/AdminReviewsTable";
 import AdminOverview from "@/components/adminDashboard/AdminOverview";
 import AdminProfile from "@/components/adminDashboard/AdminProfile";
 import Footer from "@/components/shared/Footer";
+import LoadingPage from "@/app/loading";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -111,7 +112,9 @@ export default function AdminDashboard() {
     router.refresh();
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <LoadingPage />;
+  }
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}

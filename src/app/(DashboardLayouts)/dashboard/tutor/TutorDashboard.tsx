@@ -15,6 +15,7 @@ import TutorAvailability from "@/components/tutorDashboard/TutorAvailability";
 import Bookings from "@/components/tutorDashboard/Bookings";
 import Reviews from "@/components/tutorDashboard/Reviews";
 import UpcomingSessions from "@/components/tutorDashboard/UpcomingSessions";
+import LoadingPage from "@/app/loading";
 
 type TabKey =
   | "overview"
@@ -75,7 +76,9 @@ export default function TutorDashboard() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
