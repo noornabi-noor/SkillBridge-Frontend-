@@ -93,14 +93,14 @@ export function LoginForm({
                   {loading ? "Logging in..." : "Login"}
                 </Button>
 
-                <Button
+                {/* <Button
                   variant="outline"
                   type="button"
                   className="w-full"
                   onClick={loginWithGoogle}
                 >
                   Sign up with Google
-                </Button>
+                </Button> */}
 
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}

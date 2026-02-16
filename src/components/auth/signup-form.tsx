@@ -183,14 +183,14 @@ export function SignupForm({
                   {loading ? "Creating account..." : "Create Account"}
                 </Button>
 
-                <Button
+                {/* <Button
                   variant="outline"
                   type="button"
                   className="w-full"
                   onClick={loginWithGoogle}
                 >
                   Sign up with Google
-                </Button>
+                </Button> */}
 
                 <FieldDescription className="text-center">
                   Already have an account?{" "}
