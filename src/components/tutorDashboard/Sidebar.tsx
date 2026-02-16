@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
   HomeIcon,
   UserCircleIcon,
@@ -23,79 +22,82 @@ type TabKey =
 interface SidebarProps {
   activeTab: TabKey;
   setActiveTab: (tab: TabKey) => void;
+  open: boolean;
+  setOpen: (val: boolean) => void;
 }
 
-export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, open, setOpen }: SidebarProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
 
   const tabs = [
-    { label: "Home", key: "home", href: "/", icon: <HomeIcon className="h-3 w-3" /> },
-    { label: "Overview", key: "overview", icon: <ChartBarIcon className="h-3 w-3" /> },
-    { label: "My Profile", key: "profile", icon: <UserCircleIcon className="h-3 w-3" /> },
-    { label: "Availability", key: "availability", icon: <CalendarDaysIcon className="h-3 w-3" /> },
-    { label: "Bookings", key: "bookings", icon: <ClipboardDocumentListIcon className="h-3 w-3" /> },
-    { label: "Reviews", key: "reviews", icon: <ChatBubbleLeftRightIcon className="h-3 w-3" /> },
-    { label: "Upcoming Sessions", key: "upcoming", icon: <ClockIcon className="h-3 w-3" /> },
+    { label: "Home", key: "home", href: "/", icon: <HomeIcon className="h-5 w-5" /> },
+    { label: "Overview", key: "overview", icon: <ChartBarIcon className="h-5 w-5" /> },
+    { label: "My Profile", key: "profile", icon: <UserCircleIcon className="h-5 w-5" /> },
+    { label: "Availability", key: "availability", icon: <CalendarDaysIcon className="h-5 w-5" /> },
+    { label: "Bookings", key: "bookings", icon: <ClipboardDocumentListIcon className="h-5 w-5" /> },
+    { label: "Reviews", key: "reviews", icon: <ChatBubbleLeftRightIcon className="h-5 w-5" /> },
+    { label: "Upcoming Sessions", key: "upcoming", icon: <ClockIcon className="h-5 w-5" /> },
   ];
 
   return (
-    <aside className="bg-white dark:bg-gray-950 shadow-lg rounded-lg">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 md:p-6">
-        <h2 className="hidden lg:block text-2xl font-bold text-gray-800 dark:text-gray-100">
-          Tutor Dashboard
-        </h2>
+    <>
+      {/* Overlay for mobile */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
-        <button
-          className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-800"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? "✖" : "☰"}
-        </button>
-      </div>
-
-      {/* Sidebar */}
-      <ul
-        className={`grid grid-cols-1 gap-2 px-2 pb-4
-          ${open ? "block" : "hidden"}
-          md:block md:w-32 lg:w-64`}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-950 shadow-lg z-50
+          transform md:translate-x-0 transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+        `}
       >
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
+        {/* Header */}
+        <div className="flex items-center justify-between p-6">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Tutor Dashboard</h2>
 
-          return (
-            <li
-              key={tab.key}
-              title={tab.label}
-              onClick={() => {
-                if (tab.key === "home" && tab.href) {
-                  router.push(tab.href);
-                } else {
-                  setActiveTab(tab.key as TabKey);
-                }
-                setOpen(false);
-              }}
-              className={`flex flex-col lg:flex-row items-center
-                justify-center lg:justify-start
-                gap-1 lg:gap-3 cursor-pointer rounded-lg
-                p-2 lg:p-3 font-medium transition-colors duration-200
-                ${
-                  isActive
+          {/* Close button on mobile */}
+          <button
+            className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-800"
+            onClick={() => setOpen(false)}
+          >
+            ✖
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <ul className="px-4 space-y-2">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <li
+                key={tab.key}
+                onClick={() => {
+                  if (tab.key === "home" && tab.href) router.push(tab.href);
+                  else setActiveTab(tab.key as TabKey);
+                  setOpen(false); // close sidebar on mobile
+                }}
+                className={`
+                  flex items-center gap-3 cursor-pointer rounded-lg p-3 font-medium transition-colors
+                  ${isActive
                     ? "bg-blue-500 text-white dark:bg-blue-600"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800"
-                }`}
-            >
-              {tab.icon}
-
-              {/* Tablet & PC text */}
-              <span className="hidden md:block text-xs lg:text-sm text-center lg:text-left whitespace-nowrap">
-                {tab.label}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </aside>
+                  }
+                `}
+              >
+                {tab.icon}
+                <span className="text-sm">{tab.label}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </aside>
+    </>
   );
 }
+
+

@@ -1,4 +1,4 @@
-import { getSingleTutor } from "@/services/tutors/tutors";
+import { getSingleTutor } from "@/services/dashboard/tutor";
 
 interface TutorDetailsPageProps {
   params: { id: string } | Promise<{ id: string }>;
@@ -95,7 +95,7 @@ export default async function TutorDetailsPage(props: TutorDetailsPageProps) {
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">{review.student.name}</p>
                   <p className="text-gray-600 dark:text-gray-300 text-sm">{review.comment}</p>
-                  <p className="text-yellow-500 dark:text-yellow-400 text-sm mt-1">⭐ {review.rating}/5</p>
+                  <p className="text-yellow-500 dark:text-yellow-400 text-sm mt-1">⭐ {review.rating.toFixed(1)}/5</p>
                 </div>
               </div>
             ))}

@@ -18,6 +18,7 @@ import AdminCategoriesTable from "@/components/adminDashboard/AdminCategoriesTab
 import AdminReviewsTable from "@/components/adminDashboard/AdminReviewsTable";
 import AdminOverview from "@/components/adminDashboard/AdminOverview";
 import AdminProfile from "@/components/adminDashboard/AdminProfile";
+import Footer from "@/components/shared/Footer";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -111,32 +112,31 @@ export default function AdminDashboard() {
   };
 
   if (loading) return <div>Loading...</div>;
-
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 min-w-0">
+      {/* Main Area */}
+      <div className="md:ml-64 md:pl-4 flex flex-col min-h-screen">
         {/* Navbar */}
-        <div className="px-6 pt-4">
-          <Navbar user={user} onLogout={handleLogout} />
-        </div>
+        <Navbar
+          user={user}
+          onLogout={handleLogout}
+          onToggleSidebar={() => {}}
+        />
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <main className="flex-1 p-6">
           {activeTab === "overview" && <AdminOverview />}
-
           {activeTab === "users" && <AdminUsersTable initialUsers={users} />}
-
           {activeTab === "bookings" && <AdminBookingsTable />}
-
           {activeTab === "categories" && <AdminCategoriesTable />}
-
           {activeTab === "reviews" && <AdminReviewsTable />}
-
           {activeTab === "profile" && <AdminProfile />}
+        </main>
+        <div className="mt-auto">
+          <Footer />
         </div>
       </div>
     </div>

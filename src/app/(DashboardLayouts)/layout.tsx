@@ -23,7 +23,7 @@ export default async function DashboardLayout({
           >
             <ToastProvider />
             {children}
-            <Footer/>
+            {/* <Footer/> */}
           </ThemeProvider>
   </div>;
 }

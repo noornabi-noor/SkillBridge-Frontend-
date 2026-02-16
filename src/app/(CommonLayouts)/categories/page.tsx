@@ -7,7 +7,6 @@ import BookTutorButton from "@/components/modules/tutors/BookTutorButton";
 import { getCurrentUser } from "@/services/auth/auth";
 import { getCategories } from "@/services/tutors/tutors";
 
-
 interface User {
   name: string;
   image?: string | null;
@@ -56,10 +55,6 @@ export default function CategoryWiseTutors() {
     }
     fetchData();
   }, []);
-
-  const handleSeeDetails = (tutorId: string) => {
-    router.push(`/tutors/${tutorId}`);
-  };
 
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -112,7 +107,7 @@ export default function CategoryWiseTutors() {
                     </p>
                   )}
 
-                  <div className="mt-4 flex justify-between">
+                  <div className="mt-4 flex w-full justify-between">
                     {/* Book button */}
                     <BookTutorButton tutor={t.tutor} user={user} />
 

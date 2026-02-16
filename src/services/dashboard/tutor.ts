@@ -2,6 +2,17 @@
 import { cookies } from "next/headers";
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
+
+export async function getSingleTutor(id: string) {
+  const res = await fetch(`${API_URL}/api/tutors/${id}`, {credentials: "include", cache: "no-store" });
+  if (!res.ok) {
+    console.error(`Failed to fetch tutor with id: ${id}`, await res.text());
+    return null; 
+  }
+  const json = await res.json();
+  return json.data;
+}
+
 // Tutor Profile with fallback
 export async function getTutorProfile(tutorId: string, userProfile: any) {
   const cookieStore = await cookies();

@@ -64,6 +64,7 @@ export default function BecomeTutorPage() {
 
         <input
           type="number"
+          step={0.1}
           name="experience"
           placeholder="Years of experience"
           value={form.experience}
@@ -74,6 +75,7 @@ export default function BecomeTutorPage() {
 
         <input
           type="number"
+          step={0.1}
           name="pricePerHour"
           placeholder="Price per hour"
           value={form.pricePerHour}

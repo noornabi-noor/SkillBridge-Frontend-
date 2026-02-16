@@ -191,6 +191,7 @@ export default function TutorProfile({ stats, setStats }: TutorProfileProps) {
             className="border dark:border-gray-600 px-2 py-1 w-full rounded bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             placeholder="Rate ($/hr)"
             type="number"
+            step={0.1}
             value={formData.rate}
             onChange={(e) =>
               setFormData({ ...formData, rate: Number(e.target.value) })

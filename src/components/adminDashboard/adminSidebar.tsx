@@ -38,68 +38,88 @@ export default function AdminSidebar({
     href?: string;
     icon: React.ReactNode;
   }[] = [
-    { label: "Home", key: "home", href: "/", icon: <HomeIcon className="h-3 w-3" /> },
-    { label: "Overview", key: "overview", icon: <ChartBarIcon className="h-3 w-3" /> },
-    { label: "Users", key: "users", icon: <UserCircleIcon className="h-3 w-3" /> },
-    { label: "Bookings", key: "bookings", icon: <ClipboardDocumentListIcon className="h-3 w-3" /> },
-    { label: "Categories", key: "categories", icon: <CalendarDaysIcon className="h-3 w-3" /> },
-    { label: "Reviews", key: "reviews", icon: <ChatBubbleLeftRightIcon className="h-3 w-3" /> },
-    { label: "Profile", key: "profile", icon: <UserCircleIcon className="h-3 w-3" /> },
+    {
+      label: "Home",
+      key: "home",
+      href: "/",
+      icon: <HomeIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Overview",
+      key: "overview",
+      icon: <ChartBarIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Users",
+      key: "users",
+      icon: <UserCircleIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Bookings",
+      key: "bookings",
+      icon: <ClipboardDocumentListIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Categories",
+      key: "categories",
+      icon: <CalendarDaysIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Reviews",
+      key: "reviews",
+      icon: <ChatBubbleLeftRightIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Profile",
+      key: "profile",
+      icon: <UserCircleIcon className="h-3 w-3" />,
+    },
   ];
 
   return (
-    <aside className="bg-white dark:bg-gray-950 shadow-lg rounded-lg">
+    <aside
+      className={`
+    fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-950 shadow-lg z-50
+    transform transition-transform duration-300
+    ${open ? "translate-x-0" : "-translate-x-full"}
+    md:translate-x-0
+  `}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 md:p-6">
-        <h2 className="hidden lg:block text-2xl font-bold text-gray-800 dark:text-gray-100">
+      <div className="flex items-center justify-between p-6">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           Admin Dashboard
         </h2>
 
         <button
           className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-800"
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen(false)}
         >
-          {open ? "✖" : "☰"}
+          ✖
         </button>
       </div>
 
-      {/* Sidebar */}
-      <ul
-        className={`grid grid-cols-1 gap-2 px-2 pb-4
-          ${open ? "block" : "hidden"}
-          md:block md:w-32 lg:w-64`}
-      >
+      {/* Tabs */}
+      <ul className="px-4 space-y-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
-
           return (
             <li
               key={tab.key}
-              title={tab.label}
               onClick={() => {
-                if (tab.key === "home" && tab.href) {
-                  router.push(tab.href);
-                } else {
-                  setActiveTab(tab.key as AdminTabKey);
-                }
+                if (tab.key === "home" && tab.href) router.push(tab.href);
+                else setActiveTab(tab.key as AdminTabKey);
                 setOpen(false);
               }}
-              className={`flex flex-col lg:flex-row items-center
-                justify-center lg:justify-start
-                gap-1 lg:gap-3 cursor-pointer rounded-lg
-                p-2 lg:p-3 font-medium transition-colors duration-200
-                ${
-                  isActive
-                    ? "bg-blue-500 text-white dark:bg-blue-600"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800"
-                }`}
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors
+            ${
+              isActive
+                ? "bg-blue-500 text-white dark:bg-blue-600"
+                : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800"
+            }`}
             >
               {tab.icon}
-
-              {/* Tablet & PC text */}
-              <span className="hidden md:block text-xs lg:text-sm text-center lg:text-left whitespace-nowrap">
-                {tab.label}
-              </span>
+              <span className="text-sm">{tab.label}</span>
             </li>
           );
         })}

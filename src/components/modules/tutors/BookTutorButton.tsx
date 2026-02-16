@@ -70,7 +70,9 @@ export default function BookTutorButton({
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [freeSlots, setFreeSlots] = useState<{ startTime: number; endTime: number }[]>([]);
+  const [freeSlots, setFreeSlots] = useState<
+    { startTime: number; endTime: number }[]
+  >([]);
   const [selectedStartTime, setSelectedStartTime] = useState("");
   const [selectedEndTime, setSelectedEndTime] = useState("");
 
@@ -129,10 +131,13 @@ export default function BookTutorButton({
 
       dayBookings.forEach((b) => {
         tmp = tmp.flatMap((slot) => {
-          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime) return [slot];
+          if (b.endTime <= slot.startTime || b.startTime >= slot.endTime)
+            return [slot];
           const res: { startTime: number; endTime: number }[] = [];
-          if (b.startTime > slot.startTime) res.push({ startTime: slot.startTime, endTime: b.startTime });
-          if (b.endTime < slot.endTime) res.push({ startTime: b.endTime, endTime: slot.endTime });
+          if (b.startTime > slot.startTime)
+            res.push({ startTime: slot.startTime, endTime: b.startTime });
+          if (b.endTime < slot.endTime)
+            res.push({ startTime: b.endTime, endTime: slot.endTime });
           return res;
         });
       });
@@ -150,16 +155,22 @@ export default function BookTutorButton({
     setSelectedEndTime("");
     calculateFreeSlots(date);
   };
-
+ 
   const bookTutor = async () => {
-    if (!selectedDate || !selectedStartTime || !selectedEndTime) return alert("Select date and time");
+    if (!selectedDate || !selectedStartTime || !selectedEndTime) {
+      return alert("Select date and time");
+    }
 
     const startMin = toMinutes24h(selectedStartTime);
     const endMin = toMinutes24h(selectedEndTime);
 
     if (availability.length > 0) {
-      const valid = freeSlots.some((s) => startMin >= s.startTime && endMin <= s.endTime && startMin < endMin);
-      if (!valid) return alert("Selected time is invalid or overlaps existing bookings");
+      const valid = freeSlots.some(
+        (s) =>
+          startMin >= s.startTime && endMin <= s.endTime && startMin < endMin,
+      );
+      if (!valid)
+        return alert("Selected time is invalid or overlaps existing bookings");
     } else if (startMin >= endMin) {
       return alert("End time must be after start time");
     }
@@ -172,9 +183,9 @@ export default function BookTutorButton({
         endTime: selectedEndTime,
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Booking failed");
+      // If your API returns { success: boolean, message: string } format:
+      if (!res.success) {
+        throw new Error(res.message || "Booking failed");
       }
 
       alert("Booking request sent ✅");
@@ -183,9 +194,9 @@ export default function BookTutorButton({
       setSelectedStartTime("");
       setSelectedEndTime("");
       setFreeSlots([]);
-      fetchBookings();
+      fetchBookings(); // update booking list immediately
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Booking failed ❌");
     }
   };
 
@@ -218,22 +229,29 @@ export default function BookTutorButton({
               {tutor.user.name}
             </h2>
 
-            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Availability</h3>
+            <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
+              Availability
+            </h3>
             {availability.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No availability set. You can book any time.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                No availability set. You can book any time.
+              </p>
             ) : (
               availability.map((a) => (
                 <div
                   key={a.id}
                   className="border rounded p-2 mb-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
-                  <strong>{days[a.dayOfWeek]}</strong> {minutesToTime12h(toMinutes24h(a.startTime))} –{" "}
+                  <strong>{days[a.dayOfWeek]}</strong>{" "}
+                  {minutesToTime12h(toMinutes24h(a.startTime))} –{" "}
                   {minutesToTime12h(toMinutes24h(a.endTime))}
                 </div>
               ))
             )}
 
-            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">Select Date:</label>
+            <label className="text-sm font-medium mt-3 block text-gray-800 dark:text-gray-200">
+              Select Date:
+            </label>
             <input
               type="date"
               value={selectedDate}
@@ -243,7 +261,9 @@ export default function BookTutorButton({
 
             {selectedDate && (
               <>
-                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">Select Time</h3>
+                <h3 className="font-medium mb-2 text-gray-800 dark:text-gray-200">
+                  Select Time
+                </h3>
                 {freeSlots.length > 0 ? (
                   freeSlots.map((slot) => (
                     <div
@@ -251,7 +271,8 @@ export default function BookTutorButton({
                       className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
                       <div>
-                        Free Slot: {minutesToTime12h(slot.startTime)} – {minutesToTime12h(slot.endTime)}
+                        Free Slot: {minutesToTime12h(slot.startTime)} –{" "}
+                        {minutesToTime12h(slot.endTime)}
                       </div>
                       <div className="flex gap-2">
                         <input
@@ -264,7 +285,10 @@ export default function BookTutorButton({
                         />
                         <input
                           type="time"
-                          min={selectedStartTime || minutesToTime24h(slot.startTime)}
+                          min={
+                            selectedStartTime ||
+                            minutesToTime24h(slot.startTime)
+                          }
                           max={minutesToTime24h(slot.endTime)}
                           value={selectedEndTime}
                           onChange={(e) => setSelectedEndTime(e.target.value)}

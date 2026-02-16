@@ -20,6 +20,7 @@ import {
   ChatBubbleLeftRightIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
+import Footer from "@/components/shared/Footer";
 
 type ActiveTab =
   | "overview"
@@ -78,44 +79,71 @@ export default function StudentDashboard() {
     href?: string;
     icon: React.ReactNode;
   }[] = [
-    { label: "Home", key: "home", href: "/", icon: <HomeIcon className="h-5 w-5" /> },
-    { label: "Overview", key: "overview", icon: <ChartBarIcon className="h-5 w-5" /> },
-    { label: "Browse Tutors", key: "browseTutors", icon: <UserCircleIcon className="h-5 w-5" /> },
-    { label: "My Bookings", key: "myBookings", icon: <ClipboardDocumentListIcon className="h-5 w-5" /> },
-    { label: "My Review", key: "review", icon: <ChatBubbleLeftRightIcon className="h-5 w-5" /> },
-    { label: "My Profile", key: "profile", icon: <UserCircleIcon className="h-5 w-5" /> },
+    {
+      label: "Home",
+      key: "home",
+      href: "/",
+      icon: <HomeIcon className="h-5 w-5" />,
+    },
+    {
+      label: "Overview",
+      key: "overview",
+      icon: <ChartBarIcon className="h-5 w-5" />,
+    },
+    {
+      label: "Browse Tutors",
+      key: "browseTutors",
+      icon: <UserCircleIcon className="h-5 w-5" />,
+    },
+    {
+      label: "My Bookings",
+      key: "myBookings",
+      icon: <ClipboardDocumentListIcon className="h-5 w-5" />,
+    },
+    {
+      label: "My Review",
+      key: "review",
+      icon: <ChatBubbleLeftRightIcon className="h-5 w-5" />,
+    },
+    {
+      label: "My Profile",
+      key: "profile",
+      icon: <UserCircleIcon className="h-5 w-5" />,
+    },
   ];
-
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
-      <aside className="bg-white dark:bg-gray-800 shadow p-4 md:p-6 rounded-r-lg">
+      <aside
+        className={`
+        fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50
+        transform transition-transform duration-300
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0
+      `}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 hidden md:block">
+        <div className="flex items-center justify-between p-6">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
             Student Dashboard
           </h2>
+
           <button
             className="md:hidden p-2 rounded bg-gray-200 dark:bg-gray-700"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+            onClick={() => setSidebarOpen(false)}
           >
-            {sidebarOpen ? "✖" : "☰"}
+            ✖
           </button>
         </div>
 
         {/* Menu */}
-        <ul
-          className={`grid grid-cols-1 gap-2 ${
-            sidebarOpen ? "block" : "hidden"
-          } md:block`}
-        >
+        <ul className="px-4 space-y-2">
           {menuItems.map((item) => {
             const isActive = activeTab === item.key;
 
             return (
               <li
                 key={item.key}
-                title={item.label}
                 onClick={() => {
                   if (item.href) {
                     router.push(item.href);
@@ -124,32 +152,44 @@ export default function StudentDashboard() {
                   }
                   setSidebarOpen(false);
                 }}
-                className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors duration-200
-                  ${
-                    isActive
-                      ? "bg-blue-500 text-white dark:bg-blue-600"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }
-                `}
+                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors
+                ${
+                  isActive
+                    ? "bg-blue-500 text-white dark:bg-blue-600"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                }
+              `}
               >
                 {item.icon}
-                <span className="hidden md:block text-sm">{item.label}</span>
+                <span className="text-sm">{item.label}</span>
               </li>
             );
           })}
         </ul>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 p-6 overflow-auto">
-        <Navbar user={user} onLogout={handleLogout} />
+      {/* Main Area */}
+      <div className="md:ml-64 md:pl-4 flex flex-col min-h-screen">
+        {/* Navbar */}
+        <Navbar
+          user={user}
+          onLogout={handleLogout}
+          onToggleSidebar={() => setSidebarOpen(true)}
+        />
 
-        <div className="mt-6">
+        {/* Content */}
+        <main className="flex-1 p-6">
           {activeTab === "overview" && <StudentOverview studentId={user.id} />}
           {activeTab === "browseTutors" && <BrowseTutors />}
-          {activeTab === "myBookings" && <StudentBookings studentId={user.id} />}
+          {activeTab === "myBookings" && (
+            <StudentBookings studentId={user.id} />
+          )}
           {activeTab === "review" && <StudentReviews studentId={user.id} />}
           {activeTab === "profile" && <StudentProfile studentId={user.id} />}
+        </main>
+        {/* Footer pushed down */}
+        <div className="mt-auto">
+          <Footer />
         </div>
       </div>
     </div>

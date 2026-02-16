@@ -3,7 +3,7 @@ import { authClient } from "./auth-client";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function login(data: { email: string; password: string }) {
-  const res = await fetch("/api/auth/sign-in/email", {
+  const res = await fetch(`/api/auth/sign-in/email`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -28,7 +28,7 @@ export async function register(data: {
   role: string;
   image?: string;
 }) {
-  const res = await fetch("/api/auth/sign-up/email", {
+  const res = await fetch(`/api/auth/sign-up/email`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -49,16 +49,40 @@ export async function register(data: {
   return JSON.parse(text);
 }
 
+// export async function loginWithGoogle() {
+//   await authClient.signIn.social({
+//     provider: "google",
+//     // callbackURL: "http://localhost:3000/dashboard", 
+//     // callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`, 
+//     // callbackURL: "/dashboard"
+//     callbackURL: "https://skillbridge-frontend-liard.vercel.app/dashboard"
+//   });
+// }
+
+
+// export async function loginWithGoogle() {
+//   // await authClient.signIn.social({
+//   //   provider: "google",
+//   //   callbackURL: "https://skill-bridge-mocha.vercel.app/dashboard"
+//   //   // backend will handle callback & redirect
+//   // });
+
+//   await authClient.signIn.social({
+//   provider: "google",
+//   callbackURL: "https://skillbridge-frontend-liard.vercel.app/dashboard"
+// });
+// }
+
+
 export async function loginWithGoogle() {
   await authClient.signIn.social({
     provider: "google",
-    // callbackURL: "http://localhost:3000/dashboard", 
-    callbackURL: `${APP_URL}/dashboard`, 
+    callbackURL: "https://skillbridge-frontend-liard.vercel.app/"
   });
 }
 
 export async function logout() {
-  const res = await fetch("/api/auth/sign-out", {
+  const res = await fetch(`/api/auth/sign-out`, {
     method: "POST",
     credentials: "include",
   });
