@@ -16,6 +16,7 @@ import AdminSidebar from "@/components/adminDashboard/adminSidebar";
 import AdminBookingsTable from "@/components/adminDashboard/AdminBookingsTable";
 import AdminCategoriesTable from "@/components/adminDashboard/AdminCategoriesTable";
 import AdminReviewsTable from "@/components/adminDashboard/AdminReviewsTable";
+import AdminPaymentsTable from "@/components/adminDashboard/AdminPaymentsTable";
 import AdminOverview from "@/components/adminDashboard/AdminOverview";
 import AdminProfile from "@/components/adminDashboard/AdminProfile";
 import Footer from "@/components/shared/Footer";
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "bookings" | "categories" | "reviews" | "profile"
+    "overview" | "users" | "bookings" | "categories" | "reviews" | "payments" | "profile"
   >("overview");
 
   // Persist active tab (same as tutor)
@@ -44,6 +45,7 @@ export default function AdminDashboard() {
       | "bookings"
       | "categories"
       | "reviews"
+      | "payments"
       | "profile"
       | null;
     if (saved) setActiveTab(saved);
@@ -136,6 +138,7 @@ export default function AdminDashboard() {
           {activeTab === "bookings" && <AdminBookingsTable />}
           {activeTab === "categories" && <AdminCategoriesTable />}
           {activeTab === "reviews" && <AdminReviewsTable />}
+          {activeTab === "payments" && <AdminPaymentsTable />}
           {activeTab === "profile" && <AdminProfile />}
         </main>
         <div className="mt-auto">

@@ -100,7 +100,7 @@ export async function updateBookingStatusAdmin(
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const res = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+  const res = await fetch(`${API_URL}/api/v1/bookings/${bookingId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -152,7 +152,7 @@ export async function createCategoryAdmin(name: string) {
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const res = await fetch(`${API_URL}/api/categories`, {
+  const res = await fetch(`${API_URL}/api/v1/categories`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export async function deleteCategoryAdmin(categoryId: string) {
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const res = await fetch(`${API_URL}/api/categories/${categoryId}`, {
+  const res = await fetch(`${API_URL}/api/v1/categories/${categoryId}`, {
     method: "DELETE",
     headers: {
       Cookie: cookieHeader,
@@ -205,7 +205,7 @@ export async function updateCategoryAdmin(
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
 
-  const res = await fetch(`${API_URL}/api/categories/${categoryId}`, {
+  const res = await fetch(`${API_URL}/api/v1/categories/${categoryId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -228,7 +228,7 @@ export async function getAllReviewsAdmin() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
 
-  const res = await fetch(`${API_URL}/api/reviews/admin`, {
+  const res = await fetch(`${API_URL}/api/v1/reviews/admin`, {
     headers: { Cookie: cookieHeader },
     cache: "no-store",
   });
@@ -252,7 +252,7 @@ export async function deleteReviewAdmin(reviewId: string) {
 
 
   const res = await fetch(
-    `${API_URL}/api/reviews/admin/${reviewId}`,
+    `${API_URL}/api/v1/reviews/admin/${reviewId}`,
     {
       method: "DELETE", 
       headers: {
@@ -293,5 +293,31 @@ export async function getAdminDashboardStats() {
   } catch (error) {
     console.error("getAdminDashboardStats error:", error);
     return null;
+  }
+}
+
+export async function getAllPaymentsAdmin() {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
+
+    const res = await fetch(`${API_URL}/api/v1/payments`, {
+      headers: { Cookie: cookieHeader },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("Failed to load payments status:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("getAllPaymentsAdmin error:", error);
+    return [];
   }
 }

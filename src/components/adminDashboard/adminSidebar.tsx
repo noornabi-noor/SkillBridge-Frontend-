@@ -18,6 +18,7 @@ type AdminTabKey =
   | "bookings"
   | "categories"
   | "reviews"
+  | "payments"
   | "profile";
 
 interface AdminSidebarProps {
@@ -68,6 +69,11 @@ export default function AdminSidebar({
       label: "Reviews",
       key: "reviews",
       icon: <ChatBubbleLeftRightIcon className="h-3 w-3" />,
+    },
+    {
+      label: "Payments",
+      key: "payments",
+      icon: <ChartBarIcon className="h-3 w-3" />,
     },
     {
       label: "Profile",
