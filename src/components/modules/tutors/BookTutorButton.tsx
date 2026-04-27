@@ -2,7 +2,8 @@
 
 import { createBooking, getMyBookings } from "@/services/dashboard/booking";
 import { getTutorAvailability } from "@/services/dashboard/tutorAvailability";
-import { useEffect, useState } from "react";
+import { createCheckoutSession } from "@/services/payment";
+import React, { useEffect, useState } from "react";
 
 interface Tutor {
   id: string;
@@ -75,6 +76,7 @@ export default function BookTutorButton({
   >([]);
   const [selectedStartTime, setSelectedStartTime] = useState("");
   const [selectedEndTime, setSelectedEndTime] = useState("");
+  const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
     if (showModal) {
@@ -105,10 +107,10 @@ export default function BookTutorButton({
 
   const calculateFreeSlots = (date: string) => {
     const dayOfWeek = new Date(date).getDay();
-    const dayAvail = availability.filter((a) => a.dayOfWeek === dayOfWeek);
+    const dayAvail = availability.filter((a: Availability) => a.dayOfWeek === dayOfWeek);
     let slots: { startTime: number; endTime: number }[] = [];
 
-    dayAvail.forEach((a) => {
+    dayAvail.forEach((a: Availability) => {
       let start = toMinutes24h(a.startTime);
       let end = toMinutes24h(a.endTime);
       if (end === 0) end = 24 * 60; // handle midnight
@@ -117,19 +119,19 @@ export default function BookTutorButton({
 
       const dayBookings = bookings
         .filter(
-          (b) =>
+          (b: Booking) =>
             b.tutorId === tutor.id &&
             b.date === date &&
             ["PENDING", "CONFIRMED"].includes(b.status),
         )
-        .map((b) => {
+        .map((b: Booking) => {
           let bStart = toMinutes24h(b.startTime);
           let bEnd = toMinutes24h(b.endTime);
           if (bEnd === 0) bEnd = 24 * 60;
           return { startTime: bStart, endTime: bEnd };
         });
 
-      dayBookings.forEach((b) => {
+      dayBookings.forEach((b: { startTime: number; endTime: number }) => {
         tmp = tmp.flatMap((slot) => {
           if (b.endTime <= slot.startTime || b.startTime >= slot.endTime)
             return [slot];
@@ -176,6 +178,7 @@ export default function BookTutorButton({
     }
 
     try {
+      setIsBooking(true);
       const res = await createBooking({
         tutorId: tutor.id,
         date: selectedDate,
@@ -183,20 +186,35 @@ export default function BookTutorButton({
         endTime: selectedEndTime,
       });
 
-      // If your API returns { success: boolean, message: string } format:
       if (!res.success) {
         throw new Error(res.message || "Booking failed");
       }
 
-      alert("Booking request sent ✅");
-      setShowModal(false);
-      setSelectedDate("");
-      setSelectedStartTime("");
-      setSelectedEndTime("");
-      setFreeSlots([]);
-      fetchBookings(); // update booking list immediately
+      // --- Payment Integration ---
+      try {
+        const bookingId = res.data?.id || res.id; // Support both wrapped and direct id
+        if (!bookingId) {
+          throw new Error("No booking ID received from server.");
+        }
+
+        const sessionRes = await createCheckoutSession(bookingId);
+        
+        if (sessionRes?.url) {
+          window.location.href = sessionRes.url;
+        } else {
+          throw new Error("Stripe checkout URL not found in response.");
+        }
+      } catch (paymentErr: any) {
+        console.error("Payment initiation failed:", paymentErr);
+        alert(`Booking was successful, but we couldn't start the payment: ${paymentErr.message}. You can pay from your dashboard.`);
+        setShowModal(false);
+      }
+
     } catch (err: any) {
+      console.error("Booking Error:", err);
       alert(err.message || "Booking failed ❌");
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -237,7 +255,7 @@ export default function BookTutorButton({
                 No availability set. You can book any time.
               </p>
             ) : (
-              availability.map((a) => (
+              availability.map((a: Availability) => (
                 <div
                   key={a.id}
                   className="border rounded p-2 mb-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -265,7 +283,7 @@ export default function BookTutorButton({
                   Select Time
                 </h3>
                 {freeSlots.length > 0 ? (
-                  freeSlots.map((slot) => (
+                  freeSlots.map((slot: { startTime: number; endTime: number }) => (
                     <div
                       key={`${slot.startTime}-${slot.endTime}`}
                       className="border rounded p-2 mb-2 flex flex-col gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -319,9 +337,14 @@ export default function BookTutorButton({
 
                 <button
                   onClick={bookTutor}
-                  className="mt-2 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                  disabled={isBooking}
+                  className={`mt-2 w-full py-2 rounded text-white transition-colors ${
+                    isBooking
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600"
+                  }`}
                 >
-                  Book Selected Time
+                  {isBooking ? "Processing..." : "Book Selected Time"}
                 </button>
               </>
             )}

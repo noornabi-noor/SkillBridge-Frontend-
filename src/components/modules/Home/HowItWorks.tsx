@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 // Steps data
@@ -14,6 +15,7 @@ const steps = [
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
+        suppressHydrationWarning
       >
         <path
           strokeLinecap="round"
@@ -34,6 +36,7 @@ const steps = [
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
+        suppressHydrationWarning
       >
         <path
           strokeLinecap="round"
@@ -54,6 +57,7 @@ const steps = [
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
+        suppressHydrationWarning
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
@@ -63,6 +67,14 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <section className="relative py-32 overflow-hidden dark:bg-gray-900 mt-3 rounded-3xl">
       {/* Animated Gradient Background */}

@@ -1,7 +1,7 @@
 "use client";
 
 import LoadingPage from "@/app/loading";
-import { Booking, getBookingsByStudent } from "@/services/dashboard/booking";
+import { Booking, getStudentOwnBookings } from "@/services/dashboard/booking";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -14,8 +14,9 @@ export default function StudentOverview({ studentId }: Props) {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      const studentBookings = await getBookingsByStudent(studentId);
-      setBookings(studentBookings);
+      const studentBookings = await getStudentOwnBookings();
+      console.log("DEBUG Student Overview Bookings:", studentBookings);
+      setBookings(studentBookings || []);
       setLoading(false);
     };
 
@@ -26,15 +27,26 @@ export default function StudentOverview({ studentId }: Props) {
     return <LoadingPage />;
   }
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const totalSessions = bookings.length;
-  const pendingSessions = bookings.filter((b) => b.status === "PENDING").length;
-  const completedSessions = bookings.filter(
-    (b) => b.status === "COMPLETED",
-  ).length;
-  const upcomingSessions = bookings.filter(
-    (b) => new Date(b.date) >= today && b.status !== "CANCELLED",
-  ).length;
+  const pendingSessionsList = bookings.filter((b) => b.status === "PENDING");
+  const completedSessionsList = bookings.filter((b) => b.status === "COMPLETED");
+  const upcomingSessionsList = bookings.filter(
+    (b) => new Date(b.date) >= today && b.status === "CONFIRMED",
+  );
+
+  console.log("DEBUG Student Stats Counts:", {
+    totalSessions,
+    pending: pendingSessionsList.length,
+    completed: completedSessionsList.length,
+    upcoming: upcomingSessionsList.length,
+    upcomingListIndices: upcomingSessionsList.map(b => b.id)
+  });
+
+  const pendingSessions = pendingSessionsList.length;
+  const completedSessions = completedSessionsList.length;
+  const upcomingSessions = upcomingSessionsList.length;
 
   const cardClasses =
     "p-4 rounded shadow transition-colors duration-300 bg-white dark:bg-gray-800";

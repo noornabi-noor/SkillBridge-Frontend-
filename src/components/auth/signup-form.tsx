@@ -57,7 +57,9 @@ export function SignupForm({
         "A verification email has been sent to your inbox. Please check it and verify your email before logging in.",
       );
     } catch (err: any) {
-      setError(err.message || "Registration failed");
+      console.error("Registration Error Details:", err);
+      // Display the specific error message from the server if available
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }

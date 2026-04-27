@@ -178,7 +178,10 @@ export default function StudentReviews({ studentId }: Props) {
                 max={5}
                 step={0.1}
                 value={rating}
-                onChange={(e) => setRating(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setRating(isNaN(val) ? 0 : val);
+                }}
                 className="border px-2 py-1 w-full rounded mb-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
 
@@ -211,7 +214,10 @@ export default function StudentReviews({ studentId }: Props) {
             max={5}
             step={0.1}
             value={rating}
-            onChange={(e) => setRating(parseFloat(e.target.value))}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              setRating(isNaN(val) ? 0 : val);
+            }}
             className="border px-2 py-1 w-full rounded mb-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <label className="block mb-1">Comment</label>

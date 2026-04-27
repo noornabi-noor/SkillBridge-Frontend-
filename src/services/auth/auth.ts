@@ -7,24 +7,29 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
 
-  const res = await fetch(`${API_URL}/api/me`, {
-    method: "GET",
-    headers: {
-      Cookie: cookieHeader, 
-    },
-    cache: "no-store",
-  });
+    const res = await fetch(`${API_URL}/api/v1/auth`, {
+      method: "GET",
+      headers: {
+        Cookie: cookieHeader, 
+      },
+      cache: "no-store",
+    });
 
-  if (!res.ok) return null;
+    if (!res.ok) return null;
 
-  const json = await res.json();
-  return json.data;
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("getCurrentUser error:", error);
+    return null;
+  }
 }
 
 

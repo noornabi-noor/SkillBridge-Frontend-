@@ -33,6 +33,7 @@ const menu = [
 
 function Navbar1() {
   const [user, setUser] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     async function fetchUser() {
@@ -44,12 +45,24 @@ function Navbar1() {
       }
     }
     fetchUser();
+    setMounted(true);
   }, []);
 
   const handleLogout = async () => {
     await logout();
     window.location.href = "/";
   };
+
+  if (!mounted) {
+    return (
+      <section className="border-b">
+        <PageContainer className="h-16 flex items-center justify-between">
+          <div className="text-xl font-bold">🎓 SkillBridge</div>
+          <div className="h-8 w-24" />
+        </PageContainer>
+      </section>
+    );
+  }
 
   return (
     <section className="border-b">

@@ -54,14 +54,7 @@ export default function Bookings({ stats }: { stats: any }) {
                 <div className="flex gap-2">
                   {b.status === "PENDING" && (
                     <>
-                      <button
-                        disabled={loadingId === b.id}
-                        onClick={() => handleStatusChange(b.id, "CONFIRMED")}
-                        className="px-3 py-1 bg-green-500 text-white rounded disabled:opacity-50"
-                      >
-                        Confirm
-                      </button>
-
+                      {/* Manual Confirm Removed - Redirect student to pay instead */}
                       <button
                         disabled={loadingId === b.id}
                         onClick={() => handleStatusChange(b.id, "CANCELLED")}

@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCurrentUser } from "@/services/auth/auth";
 import { logout } from "@/services/auth/authClient";
+import { toast } from "sonner";
 
 import BrowseTutors from "@/components/studentDashboard/BrowseTutors";
 import StudentBookings from "@/components/studentDashboard/StudentBookings";
@@ -22,6 +23,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Footer from "@/components/shared/Footer";
 import LoadingPage from "@/app/loading";
+import { verifyPayment } from "@/services/payment";
 
 type ActiveTab =
   | "overview"
@@ -36,6 +38,41 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const searchParams = useSearchParams();
+
+
+  const [isVerified, setIsVerified] = useState(false);
+
+  useEffect(() => {
+    const success = searchParams.get("success");
+    const cancelled = searchParams.get("cancelled");
+    const sessionId = searchParams.get("session_id");
+    const bookingId = searchParams.get("bookingId");
+
+    if (success && sessionId && bookingId && !isVerified) {
+      const handleVerify = async () => {
+        try {
+          setIsVerified(true);
+          await verifyPayment(sessionId, bookingId);
+          toast.success("Payment successful! Your session is confirmed.");
+          // Clear params from URL
+          router.replace("/dashboard");
+          router.refresh();
+        } catch (err) {
+          console.error("Verification failed", err);
+          toast.error("Payment was successful but we couldn't confirm your booking immediately. Please refresh.");
+        }
+      };
+      handleVerify();
+      setActiveTab("myBookings");
+    }
+
+    if (cancelled) {
+      toast.error("Payment cancelled. You can try paying again from your bookings list.");
+      router.replace("/dashboard");
+      setActiveTab("myBookings");
+    }
+  }, [searchParams, router, isVerified]);
 
   // Fetch logged-in user
   useEffect(() => {

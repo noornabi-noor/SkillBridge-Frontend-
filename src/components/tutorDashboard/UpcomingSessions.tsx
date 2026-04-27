@@ -7,8 +7,8 @@ export default function UpcomingSessions({ stats }: { stats: any }) {
         Upcoming Sessions
       </h2>
 
-      {stats.upcomingSessionsList.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">No upcoming sessions.</p>
+      {!stats?.upcomingSessionsList || stats.upcomingSessionsList.length === 0 ? (
+        <p className="text-gray-600 dark:text-gray-400">No upcoming sessions found.</p>
       ) : (
         <ul className="space-y-2">
           {stats.upcomingSessionsList.map((b: any) => (

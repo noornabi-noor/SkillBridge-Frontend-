@@ -5,6 +5,7 @@ import {
   cancelBooking,
   getStudentOwnBookings,
 } from "@/services/dashboard/booking";
+import { createCheckoutSession } from "@/services/payment";
 import { useEffect, useState } from "react";
 
 interface Tutor {
@@ -52,6 +53,20 @@ export default function StudentBookings({ studentId }: Props) {
     }
   };
 
+  const handlePayNow = async (bookingId: string) => {
+    try {
+      const sessionRes = await createCheckoutSession(bookingId);
+      if (sessionRes?.url) {
+        window.location.href = sessionRes.url;
+      } else {
+        throw new Error("Payment URL not found");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Could not start payment: ${err.message}`);
+    }
+  };
+
   const handleCancelBooking = async (bookingId: string) => {
     const ok = confirm("Are you sure you want to cancel this booking?");
     if (!ok) return;
@@ -59,7 +74,7 @@ export default function StudentBookings({ studentId }: Props) {
     try {
       await cancelBooking(bookingId);
       fetchBookings();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       alert("Failed to cancel booking ❌");
     }
@@ -107,14 +122,22 @@ export default function StudentBookings({ studentId }: Props) {
                   {b.status}
                 </span>
 
-                {/* Cancel button (only if PENDING) */}
+                {/* Pay/Cancel buttons (only if PENDING) */}
                 {b.status === "PENDING" && (
-                  <button
-                    onClick={() => handleCancelBooking(b.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handlePayNow(b.id)}
+                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
+                    >
+                      Pay Now
+                    </button>
+                    <button
+                      onClick={() => handleCancelBooking(b.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 )}
               </div>
             </li>

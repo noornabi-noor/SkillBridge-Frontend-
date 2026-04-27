@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const features = [
@@ -13,6 +14,7 @@ const features = [
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
+        suppressHydrationWarning
       >
         <path
           strokeLinecap="round"
@@ -83,6 +85,14 @@ const features = [
 ];
 
 export default function WhySkillBridge() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <section className="mt-3 rounded-3xl py-20 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 text-center">

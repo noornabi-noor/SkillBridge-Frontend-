@@ -1,16 +1,21 @@
 export async function getAllTutors() {
-  const res = await fetch(`/api/tutors`, {
-    credentials: "include",
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(`/api/tutors`, {
+      credentials: "include",
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch tutors");
+    if (!res.ok) {
+      console.error("Failed to fetch tutors status:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("getAllTutors error:", error);
+    return [];
   }
-
-  const json = await res.json();
-
-  return json.data;
 }
 
 // export async function getSingleTutor(id: string) {
@@ -24,52 +29,75 @@ export async function getAllTutors() {
 // }
 
 export async function getAllUsers() {
-  const res = await fetch(`/api/users`, {
-    credentials: "include",
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(`/api/users`, {
+      credentials: "include",
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch users");
+    if (!res.ok) {
+     console.error("Failed to fetch users status:", res.status);
+     return [];
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("getAllUsers error:", error);
+    return [];
   }
-
-  const json = await res.json();
-
-  return json.data;
 }
 
 
 // *-------------*//
 
 export async function getTopRatedTutor() {
-  const res = await fetch(`/api/tutors/top-tutor`, {
-    cache: "no-store",
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(`/api/tutors/top-tutor`, {
+      cache: "no-store",
+      credentials: "include",
+    });
 
-  if(!res.ok){
-    throw new Error("Failed to fetch tutors");
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => "Unknown error");
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { rawText: errorText };
+      }
+      console.error("Failed to fetch top tutors status:", res.status, errorData);
+      return [];
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("getTopRatedTutor error:", error);
+    return [];
   }
-
-  const json = await res.json();
-
-  return json.data;
 }
 
 export async function getCategories() {
-  const res = await fetch(`/api/categories`, {
-    cache: "no-store",
-    credentials: "include", // include cookies for auth
-  });
+  try {
+    const res = await fetch(`/api/categories`, {
+      cache: "no-store",
+      credentials: "include", // include cookies for auth
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch categories");
+    if (!res.ok) {
+      console.error("Failed to fetch categories status:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+
+    // Return only categories with at least one tutor
+    return json.data.filter((c: any) => c.tutors && c.tutors.length > 0);
+  } catch (error) {
+    console.error("getCategories error:", error);
+    return [];
   }
-
-  const json = await res.json();
-
-  // Return only categories with at least one tutor
-  return json.data.filter((c: any) => c.tutors && c.tutors.length > 0);
 }
 
 export type BecomeTutorPayload = {
@@ -80,36 +108,46 @@ export type BecomeTutorPayload = {
 };
 
 export async function becomeTutor(payload: BecomeTutorPayload) {
-  const res = await fetch(`/api/tutors`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include", // send cookies
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch(`/api/tutors`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // send cookies
+      body: JSON.stringify(payload),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) {
-    throw new Error(data.message || "Failed to become tutor");
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to become tutor");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("becomeTutor error:", error);
+    throw error;
   }
-  return data;
 }
 
 export async function getTutors() {
-  const res = await fetch(`/api/tutors`, {
-    cache: "no-store",
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(`/api/tutors`, {
+      cache: "no-store",
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch tutors");
+    if (!res.ok) {
+      console.error("Failed to fetch tutors status:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return Array.isArray(json.data) ? json.data : [];
+  } catch (error) {
+    console.error("getTutors error:", error);
+    return [];
   }
-
-  const json = await res.json();
-
-  return Array.isArray(json.data) ? json.data : [];
 }
 
 interface UpdateUserPayload {
@@ -130,40 +168,52 @@ export async function updateUserProfile(
   userId: string,
   payload: UpdateUserPayload,
 ) {
-  const res = await fetch(`/api/users/${userId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch(`/api/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
+    if (res.status === 401) {
+      throw new Error("UNAUTHORIZED");
+    }
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to update user profile");
+    }
+
+    return res.json();
+  } catch (error: any) {
+    console.error("updateUserProfile error:", error);
+    throw error;
   }
-
-  if (!res.ok) {
-    throw new Error("Failed to update user profile");
-  }
-
-  return res.json();
 }
 
 export async function upsertTutorProfile(
   payload: UpdateTutorPayload,
 ) {
-  const res = await fetch(`/api/tutors`, {
-    method: "PATCH", // backend already handles create/update
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch(`/api/tutors`, {
+      method: "PATCH", // backend already handles create/update
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
-  }
+    if (res.status === 401) {
+      throw new Error("UNAUTHORIZED");
+    }
 
-  if (!res.ok) {
-    throw new Error("Failed to update tutor profile");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to update tutor profile");
+    }
+    return res.json();
+  } catch (error: any) {
+    console.error("upsertTutorProfile error:", error);
+    throw error;
   }
-  return res.json();
 }

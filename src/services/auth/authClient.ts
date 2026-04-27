@@ -3,21 +3,16 @@ import { authClient } from "./auth-client";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 export async function login(data: { email: string; password: string }) {
-  const res = await fetch(`/api/auth/sign-in/email`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+  const { data: session, error } = await authClient.signIn.email({
+    email: data.email,
+    password: data.password,
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Login failed");
+  if (error) {
+    throw new Error(error.message || "Login failed");
   }
 
-  return res.json();
+  return session;
 }
 
 export async function register(data: {
@@ -28,51 +23,26 @@ export async function register(data: {
   role: string;
   image?: string;
 }) {
-  const res = await fetch(`/api/auth/sign-up/email`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+  console.log("Attempting registration for:", data.email);
+  
+  const result = await authClient.signUp.email({
+    email: data.email,
+    password: data.password,
+    name: data.name,
+    image: data.image,
+    // @ts-ignore
+    role: data.role,
+    // @ts-ignore
+    phone: data.phone, // Now enabled as backend schema is updated
   });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Registration failed");
+  if (result.error) {
+    console.error("Full Registration Error:", JSON.stringify(result.error, null, 2));
+    throw new Error(result.error.message || "Registration failed. Check console for details.");
   }
 
-  const text = await res.text();
-  if (!text) {
-    return { success: true };
-  }
-  return JSON.parse(text);
+  return result.data;
 }
-
-// export async function loginWithGoogle() {
-//   await authClient.signIn.social({
-//     provider: "google",
-//     // callbackURL: "http://localhost:3000/dashboard", 
-//     // callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`, 
-//     // callbackURL: "/dashboard"
-//     callbackURL: "https://skillbridge-frontend-liard.vercel.app/dashboard"
-//   });
-// }
-
-
-// export async function loginWithGoogle() {
-//   // await authClient.signIn.social({
-//   //   provider: "google",
-//   //   callbackURL: "https://skill-bridge-mocha.vercel.app/dashboard"
-//   //   // backend will handle callback & redirect
-//   // });
-
-//   await authClient.signIn.social({
-//   provider: "google",
-//   callbackURL: "https://skillbridge-frontend-liard.vercel.app/dashboard"
-// });
-// }
-
 
 export async function loginWithGoogle() {
   await authClient.signIn.social({
