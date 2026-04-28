@@ -91,8 +91,7 @@ export default function TutorDashboard() {
       />
 
       {/* Main content */}
-      {/* <div className="flex-1 flex flex-col md:ml-64"> */}
-      <div className="md:ml-64 md:pl-4 flex flex-col min-h-screen">
+      <div className="md:ml-64 md:pl-4 flex-1 flex flex-col">
         {/* Navbar */}
         <Navbar
           user={user}
@@ -100,7 +99,7 @@ export default function TutorDashboard() {
           onToggleSidebar={() => setSidebarOpen(true)}
         />
 
-        <div className="flex flex-col min-h-[calc(100vh-80px)] p-6">
+        <div className="flex-1 flex flex-col p-6">
           <div className="flex-1">
             {activeTab === "overview" && <OverviewCards stats={stats} />}
             {activeTab === "profile" && (

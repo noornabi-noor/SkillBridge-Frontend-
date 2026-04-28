@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/provider/theme-provider";
 
 const commonLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
@@ -12,8 +12,10 @@ const commonLayout = ({ children }: { children: React.ReactNode }) => {
         disableTransitionOnChange
       >
         <Navbar1 />
-        {children}
-        <Footer/>
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
       </ThemeProvider>
     </div>
   );
